@@ -1,11 +1,8 @@
+.git
+.github
 .gradle
-build/classes
-build/tmp
-build/reports
-build/generated
+build
 .idea
 *.iml
-.git
-.gitignore
+.env
 *.md
-Acueducto_Backend_API.postman_collection.json

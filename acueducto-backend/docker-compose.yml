@@ -1,11 +1,16 @@
 services:
   app:
-    build: .
-    ports:
-      - "8083:8083"
+    image: ghcr.io/${GHCR_OWNER}/acueducto-backend:latest
+    container_name: acueducto-backend
+    restart: unless-stopped
     environment:
-      - SPRING_PROFILES_ACTIVE=huawei
-      - url=jdbc:postgresql://<host-rds>:5432/acueducto_hato
-      - username=<usuario>
-      - password=<password>
-      - JAVA_OPTS=-Xms256m -Xmx512m
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - mas-network
+
+networks:
+  mas-network:
+    external: true
