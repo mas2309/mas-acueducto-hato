@@ -56,7 +56,7 @@
     <div class="col-sm-6 col-xl-3 fade-in-item">
         <div class="stat-card stat-card-blue">
             <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
-            <div class="stat-value" style="font-size:1.5rem;">$<s:property value="informe.totalIngresos"/></div>
+            <div class="stat-value money-format" style="font-size:1.5rem;"><s:property value="informe.totalIngresos"/></div>
             <div class="stat-label">Ingresos Totales</div>
         </div>
     </div>
@@ -97,17 +97,17 @@
                     <tbody>
                         <tr>
                             <td><span class="d-inline-block rounded-circle me-2" style="width:10px;height:10px;background:#22c55e;"></span>Efectivo</td>
-                            <td class="text-end fw-semibold">$<s:property value="informe.ingresoEfectivo"/></td>
+                            <td class="text-end fw-semibold money-format"><s:property value="informe.ingresoEfectivo"/></td>
                             <td class="text-end text-muted"><s:property value="informe.facturasPagadasEfectivo"/> fact.</td>
                         </tr>
                         <tr>
                             <td><span class="d-inline-block rounded-circle me-2" style="width:10px;height:10px;background:#3b82f6;"></span>Banco</td>
-                            <td class="text-end fw-semibold">$<s:property value="informe.ingresoBanco"/></td>
+                            <td class="text-end fw-semibold money-format"><s:property value="informe.ingresoBanco"/></td>
                             <td class="text-end text-muted"><s:property value="informe.facturasPagadasBanco"/> fact.</td>
                         </tr>
                         <tr>
                             <td><span class="d-inline-block rounded-circle me-2" style="width:10px;height:10px;background:#94a3b8;"></span>Pendiente</td>
-                            <td class="text-end fw-semibold">$<s:property value="informe.ingresoPendiente"/></td>
+                            <td class="text-end fw-semibold money-format"><s:property value="informe.ingresoPendiente"/></td>
                             <td class="text-end text-muted"><s:property value="informe.facturasPendientes + informe.facturasVencidas"/> fact.</td>
                         </tr>
                     </tbody>
@@ -143,13 +143,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Consumo</td><td class="text-end fw-semibold">$<s:property value="informe.totalConsumo"/></td></tr>
-                        <tr><td>Cargo Fijo</td><td class="text-end fw-semibold">$<s:property value="informe.totalCargoFijo"/></td></tr>
-                        <tr><td>Cuotas</td><td class="text-end fw-semibold">$<s:property value="informe.totalCuotas"/></td></tr>
-                        <tr><td>Otros Cobros</td><td class="text-end fw-semibold">$<s:property value="informe.totalOtrosCobros"/></td></tr>
-                        <tr><td>No Pago</td><td class="text-end fw-semibold">$<s:property value="informe.totalNoPago"/></td></tr>
-                        <tr><td>Deuda Anterior</td><td class="text-end fw-semibold">$<s:property value="informe.totalDeudaAnterior"/></td></tr>
-                        <tr class="border-top"><td class="fw-bold">TOTAL</td><td class="text-end fw-bold text-primary">$<s:property value="informe.totalIngresos"/></td></tr>
+                        <tr><td>Consumo</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalConsumo"/></td></tr>
+                        <tr><td>Cargo Fijo</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalCargoFijo"/></td></tr>
+                        <tr><td>Cuotas</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalCuotas"/></td></tr>
+                        <tr><td>Otros Cobros</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalOtrosCobros"/></td></tr>
+                        <tr><td>No Pago</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalNoPago"/></td></tr>
+                        <tr><td>Deuda Anterior</td><td class="text-end fw-semibold money-format"><s:property value="informe.totalDeudaAnterior"/></td></tr>
+                        <tr class="border-top"><td class="fw-bold">TOTAL</td><td class="text-end fw-bold text-primary money-format"><s:property value="informe.totalIngresos"/></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -212,14 +212,14 @@
                         <tr>
                             <td class="fw-semibold"><s:property value="mes"/></td>
                             <td class="text-center"><s:property value="cantidadFacturas"/></td>
-                            <td class="text-end">$<s:property value="ingresoConsumo"/></td>
-                            <td class="text-end">$<s:property value="ingresoCargoFijo"/></td>
-                            <td class="text-end">$<s:property value="ingresoCuotas"/></td>
-                            <td class="text-end">$<s:property value="ingresoOtrosCobros"/></td>
-                            <td class="text-end">$<s:property value="ingresoNoPago"/></td>
-                            <td class="text-end fw-bold">$<s:property value="ingresoTotal"/></td>
-                            <td class="text-end text-success">$<s:property value="ingresoEfectivo"/></td>
-                            <td class="text-end text-primary">$<s:property value="ingresoBanco"/></td>
+                            <td class="text-end money-format"><s:property value="ingresoConsumo"/></td>
+                            <td class="text-end money-format"><s:property value="ingresoCargoFijo"/></td>
+                            <td class="text-end money-format"><s:property value="ingresoCuotas"/></td>
+                            <td class="text-end money-format"><s:property value="ingresoOtrosCobros"/></td>
+                            <td class="text-end money-format"><s:property value="ingresoNoPago"/></td>
+                            <td class="text-end fw-bold money-format"><s:property value="ingresoTotal"/></td>
+                            <td class="text-end text-success money-format"><s:property value="ingresoEfectivo"/></td>
+                            <td class="text-end text-primary money-format"><s:property value="ingresoBanco"/></td>
                             <td class="text-center"><s:property value="consumoM3"/></td>
                         </tr>
                     </s:iterator>
@@ -229,6 +229,21 @@
     </div>
 </div>
 </s:if>
+
+<%-- Formateo de valores monetarios en pesos colombianos --%>
+<script>
+(function() {
+    function formatCOP(value) {
+        var num = parseInt(value.toString().replace(/[^0-9]/g, ''), 10);
+        if (isNaN(num)) return value;
+        return '$' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+    document.querySelectorAll('.money-format').forEach(function(el) {
+        var raw = el.textContent.trim();
+        if (raw) el.textContent = formatCOP(raw);
+    });
+})();
+</script>
 
 <%-- Chart.js --%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
