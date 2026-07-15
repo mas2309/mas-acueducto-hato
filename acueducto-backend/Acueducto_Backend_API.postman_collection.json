@@ -1,0 +1,1209 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Acueducto Backend API",
+		"description": "Colección de Postman para probar la API REST del sistema de gestión de acueducto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Autenticación",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', jsonData.data.accessToken);",
+									"    pm.collectionVariables.set('refresh_token', jsonData.data.refreshToken);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Usuario (Solo ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"operador1\",\n  \"password\": \"pass123456\",\n  \"nombreCompleto\": \"Operador Prueba\",\n  \"email\": \"operador@example.com\",\n  \"role\": \"OPERADOR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refrescar Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', jsonData.data.accessToken);",
+									"    pm.collectionVariables.set('refresh_token', jsonData.data.refreshToken);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set('access_token', '');",
+									"    pm.collectionVariables.set('refresh_token', '');",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login con Credenciales Incorrectas (Fuerza Bruta)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Ejecutar 5+ veces para probar el bloqueo por fuerza bruta. Después del 5to intento, la cuenta se bloquea por 15 minutos."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Crear Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Carlos\",\n  \"apellidos\": \"García López\",\n  \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuario por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Carlos\",\n  \"apellidos\": \"García Pérez\",\n  \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Desactivar Usuario",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Usuarios (Paginado)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users?page=0&size=10&sort=nombre&direction=ASC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "nombre"
+								},
+								{
+									"key": "direction",
+									"value": "ASC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/search?q=Juan&page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Juan"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuarios Activos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"active"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Casos de Error",
+			"item": [
+				{
+					"name": "Usuario No Encontrado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario No Existente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Usuario con Datos Inválidos",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"\",\n  \"apellidos\": \"García López\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Usuario con Nombre Muy Largo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Carlos Alejandro Sebastián\",\n  \"apellidos\": \"García López\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cuotas",
+			"item": [
+				{
+					"name": "Crear Cuota",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"descripcion\": \"Cuota mensual agua\",\n  \"valorTotal\": 300000.0,\n  \"numeroCuota\": 12,\n  \"cuotaActual\": 0,\n  \"usuarioId\": 1,\n  \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/quotas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Cuota por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Cuota",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"descripcion\": \"Cuota mensual agua actualizada\",\n  \"valorTotal\": 360000.0,\n  \"numeroCuota\": 12,\n  \"cuotaActual\": 2,\n  \"usuarioId\": 1,\n  \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/quotas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Desactivar Cuota",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/1/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"1",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Cuota",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Cuotas (Paginado)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas?page=0&size=10&sort=fechaInsert&direction=DESC",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "fechaInsert"
+								},
+								{
+									"key": "direction",
+									"value": "DESC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cuotas por Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/user/1?page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"user",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Cuotas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/search?q=agua&page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "agua"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Cuotas Activas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cuotas Activas por Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/quotas/active/user/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"quotas",
+								"active",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lecturas",
+			"item": [
+				{
+					"name": "Ingresar Lectura (Sin Pago)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Enero\",\n  \"anio\": 2024,\n  \"lecturaActual\": 15,\n  \"otrosCobros\": 0,\n  \"cuotaId\": null,\n  \"pago\": false,\n  \"pagoBanco\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ingresar Lectura (Con Cuota)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Febrero\",\n  \"anio\": 2024,\n  \"lecturaActual\": 25,\n  \"otrosCobros\": 0,\n  \"cuotaId\": 1,\n  \"pago\": false,\n  \"pagoBanco\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ingresar Lectura (Consumo Cero)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Marzo\",\n  \"anio\": 2024,\n  \"lecturaActual\": 25,\n  \"otrosCobros\": 0,\n  \"cuotaId\": null,\n  \"pago\": false,\n  \"pagoBanco\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Última Lectura",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/ultima/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"ultima",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facturas por Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/usuario/1?page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"usuario",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facturas por Período",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/periodo?mes=Enero&anio=2024&page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"periodo"
+							],
+							"query": [
+								{
+									"key": "mes",
+									"value": "Enero"
+								},
+								{
+									"key": "anio",
+									"value": "2024"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facturas Pendientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/pendientes?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"pendientes"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facturas Pagadas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/pagadas?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"pagadas"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Facturas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/search?q=Juan&page=0&size=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Juan"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Deuda Pendiente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/deuda/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"deuda",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Factura",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lecturas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Factura (Sin Cambio Cuota)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Enero\",\n  \"anio\": 2024,\n  \"lecturaActual\": 20,\n  \"lecturaAnterior\": 0,\n  \"otrosCobros\": 5000,\n  \"otrosCobrosDescripcion\": \"Reconexión\",\n  \"cuotaId\": null,\n  \"deudaAnterior\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Factura (Agregar Cuota)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Enero\",\n  \"anio\": 2024,\n  \"lecturaActual\": 20,\n  \"lecturaAnterior\": 0,\n  \"otrosCobros\": 0,\n  \"cuotaId\": 1,\n  \"deudaAnterior\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Factura (Cambiar Cuota)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": 1,\n  \"mes\": \"Enero\",\n  \"anio\": 2024,\n  \"lecturaActual\": 20,\n  \"lecturaAnterior\": 0,\n  \"otrosCobros\": 0,\n  \"cuotaId\": 2,\n  \"deudaAnterior\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Pago en Efectivo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"metodoPago\": \"EFECTIVO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas/50/pagar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"50",
+								"pagar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Pago en Banco",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"metodoPago\": \"BANCO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lecturas/52/pagar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lecturas",
+								"52",
+								"pagar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8083/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

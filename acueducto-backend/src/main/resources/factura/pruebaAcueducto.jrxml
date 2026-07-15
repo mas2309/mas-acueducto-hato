@@ -1,0 +1,408 @@
+<!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
+<jasperReport name="pruebaAcueducto" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fa227515-13d7-413f-9533-9d5a9e73a916">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="id" class="java.lang.Long"/>
+	<parameter name="nombres" class="java.lang.String"/>
+	<parameter name="apellidos" class="java.lang.String"/>
+	<parameter name="lectura_actual" class="java.lang.Integer"/>
+	<parameter name="lectura_anterior" class="java.lang.Integer"/>
+	<parameter name="metros_consumidos" class="java.lang.Integer"/>
+	<parameter name="consumo_actual" class="java.lang.Integer"/>
+	<parameter name="consumo_anterior" class="java.lang.Integer"/>
+	<parameter name="cargo_fijo" class="java.math.BigDecimal"/>
+	<parameter name="valor_consumo" class="java.math.BigDecimal"/>
+	<parameter name="deuda_anterior" class="java.math.BigDecimal"/>
+	<parameter name="total" class="java.lang.String"/>
+	<parameter name="descripcion" class="java.lang.String"/>
+	<parameter name="otros_cobros" class="java.math.BigDecimal"/>
+	<parameter name="descripcion_cuota" class="java.lang.String"/>
+	<parameter name="cuota_actual" class="java.lang.Integer"/>
+	<parameter name="numero_de_cuotas" class="java.lang.Integer"/>
+	<parameter name="valor_cuota" class="java.math.BigDecimal"/>
+	<parameter name="ruta_imagen" class="java.lang.String"/>
+	<parameter name="no_pago" class="java.math.BigDecimal"/>
+	<parameter name="mes" class="java.lang.String"/>
+	<query language="sql"><![CDATA[]]></query>
+	<background splitType="Stretch"/>
+	<title height="311" splitType="Stretch">
+		<element kind="rectangle" uuid="22054776-79e2-4808-b79f-41ccd88b8b3c" x="140" y="73" width="50" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="b6e8cfa6-3688-4c54-8c42-cdc014348993" x="111" y="73" width="29" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="image" uuid="c4128d7e-6fa6-4ed0-9455-43e16d35bd9c" x="293" y="10" width="43" height="45">
+			<expression><![CDATA[$P{ruta_imagen}]]></expression>
+		</element>
+		<element kind="image" uuid="bed72ec6-2fff-42b7-bc3b-8bed5607b903" x="0" y="7" width="50" height="50">
+			<expression><![CDATA[$P{ruta_imagen}]]></expression>
+		</element>
+		<element kind="rectangle" uuid="9aca5f76-2b14-4b70-a980-3e27e3cf426d" x="291" y="299" width="252" height="12" backcolor="#E3EEEE">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="rectangle" uuid="f78dcc2d-d5e7-432a-b93f-258510c020d6" x="10" y="299" width="281" height="12" backcolor="#E3EEEE">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="rectangle" uuid="261c922b-9681-4f36-b2a2-05e793a5a4bf" x="290" y="227" width="253" height="12" backcolor="#E3EEEE">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="1f1c7b6b-3ee9-43b5-8267-dbba630a2650" x="10" y="227" width="280" height="12" backcolor="#E3EEEE">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="c1f4a4a9-b931-40c9-badb-8634548ae435" x="291" y="133" width="252" height="12" backcolor="#CCCCCC">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="326d03e9-6ba5-4a60-9773-9664e236462f" x="10" y="133" width="280" height="12" backcolor="#CCCCCC">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="ec8c70ec-730e-4c61-a5ff-a83c5f5a0cfe" x="291" y="121" width="99" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="5708b0f3-9180-4465-9ccd-08e0f191b920" x="390" y="121" width="34" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="08514e55-9960-49de-944c-13299ff36347" x="424" y="121" width="90" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="ad9cd25c-ee74-4e00-bb01-ddcd4b451b32" x="514" y="121" width="29" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="e1a44b23-65bf-4647-9982-af64c8d09e11" x="291" y="109" width="99" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="7ed688da-95db-4af6-a453-a24ed445ab83" x="390" y="109" width="34" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="9f23d002-cfe7-4d40-965d-45bb8872bcaf" x="424" y="109" width="90" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="b154f6d2-dbba-41cd-8128-e6b268548cfa" x="514" y="109" width="29" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="c29d8644-46c3-4827-853c-87f9847393b3" x="291" y="97" width="59" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="666d3353-44b0-4963-9c00-da4a7a796315" x="350" y="97" width="193" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="79aeacf4-9351-48b7-aa23-c25e3c18de89" x="291" y="85" width="59" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="e6b08e29-a0e2-482f-9d97-d5fa4004c533" x="350" y="85" width="193" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="e2caee57-461f-4f86-b51e-d0435d061ceb" x="291" y="73" width="59" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="2b5eebe8-3732-48a7-9272-19b9b1a72655" x="350" y="73" width="29" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="0862d573-3289-4add-99eb-e4d38ba81d53" x="459" y="73" width="30" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="38292c32-9015-45b8-9754-7a45405e4a12" x="489" y="73" width="54" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="5a5e03a8-dda2-4b6f-84ae-202a8f4e3a72" x="10" y="121" width="111" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="57375cf2-ffd2-4344-becc-bcf7082789b5" x="121" y="121" width="36" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="825f83bd-829d-4bae-a70b-b31de6cda067" x="157" y="121" width="87" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="791564f7-1300-4375-b11d-79bbc7c28181" x="10" y="109" width="111" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="bce6b660-9888-4b8b-b7b0-c12e7cbed841" x="121" y="109" width="36" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="8aa11931-7157-49aa-b1c7-2ceaabb3edbe" x="157" y="109" width="87" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="aa643d35-f214-4731-ba9f-04ff519704c8" x="244" y="109" width="46" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="925be3f0-b446-4df5-bc49-1231f8a7cd03" x="10" y="97" width="70" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="7ad0d117-8a24-4c78-825c-63c221a57472" x="80" y="97" width="210" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="b6e4343a-3710-4cde-b0ac-2adf658d7abf" x="10" y="85" width="70" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="7f42fdef-4ce2-48b8-9cdf-4e2f7b015acb" x="80" y="85" width="210" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="136cf087-9f4b-45ef-b3da-79f68071e3c5" x="80" y="73" width="31" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="88b52979-5105-46fa-86bf-dfba51cfa778" x="190" y="73" width="30" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="56323fc9-ac97-44d3-81f6-3e6a947f3849" x="220" y="73" width="71" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="79037ac5-85f4-4f21-9320-c83391a0c83d" x="10" y="73" width="70" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="5d2af409-b077-4fd2-b5ab-1fc58be2587c" x="30" y="10" width="250" height="15" fontName="Calibri" fontSize="10.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[JUNTA ADMINISTRADORA ACUEDUCTO EL HATO]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="line" uuid="5219f05a-251a-48b5-8865-db0d5636ec90" x="290" y="0" width="1" height="311">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<pen lineStyle="Dashed"/>
+		</element>
+		<element kind="staticText" uuid="9fe2617a-073a-4559-be27-a0d6168c6d60" x="30" y="25" width="250" height="15" fontName="Calibri" fontSize="10.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[NIT: 900003723
+]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="staticText" uuid="008570cb-db02-4575-b866-ffe56df7f90d" x="30" y="40" width="250" height="15" fontName="Calibri" fontSize="10.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[TIBASOSA-BOYACÁ]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="line" uuid="20f39bdd-01cb-460b-99d3-841344b1f678" x="59" y="65" width="193" height="1"/>
+		<element kind="staticText" uuid="5962b3eb-b74d-4dca-8a0e-2fd6a3af36ea" x="320" y="10" width="238" height="15" fontName="Calibri" fontSize="9.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[JUNTA ADMINISTRADORA ACUEDUCTO EL HATO]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="staticText" uuid="9858a984-f02e-42b7-b625-b7fc4872f355" x="320" y="25" width="238" height="15" fontName="Calibri" fontSize="9.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[NIT: 900003723]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="staticText" uuid="ebc76c7c-790d-4467-a9b6-7908887a8a53" x="320" y="40" width="238" height="15" fontName="Calibri" fontSize="9.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[TIBASOSA-BOYACÁ]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="line" uuid="c72cccf8-9095-478f-907d-77382a0d162d" x="343" y="65" width="193" height="1"/>
+		<element kind="staticText" uuid="351550f0-b164-4bc3-b1a0-3a92a58998d7" x="10" y="73" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[USUARIO]]></text>
+		</element>
+		<element kind="textField" uuid="cf6051d7-282f-4052-a1f9-ba12b88fffaf" x="80" y="73" width="31" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{id}]]></expression>
+		</element>
+		<element kind="staticText" uuid="57143568-00c3-4f3e-a11e-8de1539ff75d" x="190" y="73" width="30" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[FECHA]]></text>
+		</element>
+		<element kind="textField" uuid="6c601b20-fb58-4c21-bf55-1b58ed7ffefe" x="220" y="73" width="70" height="12" fontSize="8.0" pattern="dd-MMM-yyyy" bold="true" hTextAlign="Center">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+		<element kind="staticText" uuid="87cbc2d0-a5dd-4ff0-a00f-b6807d169c2f" x="10" y="85" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[NOMBRES]]></text>
+		</element>
+		<element kind="staticText" uuid="13a3fe5c-4a51-4b43-ad90-214020ac74f1" x="10" y="97" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[APELLIDOS]]></text>
+		</element>
+		<element kind="staticText" uuid="103f44ba-0b93-482f-ada1-9984d6c01caf" x="10" y="109" width="111" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[LECTURA ACTUAL]]></text>
+		</element>
+		<element kind="staticText" uuid="2767a338-cf20-45e3-a7d0-1546e37c0238" x="10" y="121" width="111" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[CONSUMO ACTUAL]]></text>
+		</element>
+		<element kind="textField" uuid="8cb04d01-f69b-4ca2-ba5e-a32faaf8cf47" x="121" y="121" width="36" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{metros_consumidos}]]></expression>
+		</element>
+		<element kind="textField" uuid="9e212f2f-6884-4338-a27f-3875de070a44" x="121" y="109" width="36" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{lectura_actual}]]></expression>
+		</element>
+		<element kind="staticText" uuid="41c24164-c271-46d3-9c2c-68f5cefbd139" x="157" y="109" width="87" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[LECTURA ANTERIOR]]></text>
+		</element>
+		<element kind="staticText" uuid="ba56d975-da6a-4d54-8f88-5a8d22d1434f" x="157" y="121" width="87" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[CONSUM ANTERIOR]]></text>
+		</element>
+		<element kind="textField" uuid="808249a1-6b11-47b7-9d31-98f53f058fb2" x="244" y="121" width="46" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{consumo_anterior}]]></expression>
+		</element>
+		<element kind="textField" uuid="2eefc58d-0132-47be-8829-a689ffb15247" x="244" y="109" width="46" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{lectura_anterior}]]></expression>
+		</element>
+		<element kind="textField" uuid="96033332-f6ef-49f8-bc62-23a0216b1c54" x="80" y="97" width="210" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{apellidos}]]></expression>
+		</element>
+		<element kind="textField" uuid="bee7af90-a149-47b6-a03f-52c6c81a006e" x="80" y="85" width="210" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" printRepeatedValues="false" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nombres}]]></expression>
+		</element>
+		<element kind="staticText" uuid="aea54975-ffd2-4885-a710-74229e071c63" x="290" y="73" width="60" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[USUARIO]]></text>
+		</element>
+		<element kind="textField" uuid="fa627e88-22bb-4008-8976-b934bd2f3f3f" x="350" y="73" width="29" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{id}]]></expression>
+		</element>
+		<element kind="staticText" uuid="95b02bf5-cb03-417f-98b8-aaa7e4d360a7" x="459" y="73" width="30" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[FECHA]]></text>
+		</element>
+		<element kind="textField" uuid="28aa1600-d590-44a0-98b4-3889ffd6c137" x="489" y="73" width="54" height="12" fontSize="8.0" pattern="dd-MMM-yyyy" bold="true" hTextAlign="Center">
+			<expression><![CDATA[new java.util.Date()]]></expression>
+		</element>
+		<element kind="textField" uuid="a0945b94-a385-4b75-96ec-c2887680c03b" x="350" y="85" width="193" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nombres}]]></expression>
+		</element>
+		<element kind="staticText" uuid="1f485905-7354-4755-b092-4aa8c3f81dce" x="291" y="85" width="59" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[NOMBRES]]></text>
+		</element>
+		<element kind="staticText" uuid="1080dc2b-8896-4d58-875c-975944a43dbb" x="291" y="97" width="59" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[APELLIDOS]]></text>
+		</element>
+		<element kind="textField" uuid="9aa2a601-b113-42a3-8c3e-6949651ca965" x="350" y="97" width="193" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{apellidos}]]></expression>
+		</element>
+		<element kind="staticText" uuid="521a5278-1584-49b3-ab6b-0543c2667574" x="291" y="109" width="99" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[LECTURA ACTUAL]]></text>
+		</element>
+		<element kind="staticText" uuid="277791e9-16a6-42e0-b62f-cc306860b04d" x="291" y="121" width="99" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[CONSUMO ACTUAL]]></text>
+		</element>
+		<element kind="textField" uuid="333da094-ffd7-424d-b794-10821708cfd8" x="390" y="121" width="36" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{metros_consumidos}]]></expression>
+		</element>
+		<element kind="staticText" uuid="77d2f17c-7fac-4e0e-a837-71331cd5f480" x="424" y="121" width="90" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[CONSUMO ANTERIOR]]></text>
+		</element>
+		<element kind="textField" uuid="f1156e32-6e9f-423b-bef4-d6bd692a4629" x="514" y="121" width="29" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{consumo_anterior}]]></expression>
+		</element>
+		<element kind="textField" uuid="07ef10da-7429-4c79-8b80-e70d99d5c784" x="514" y="109" width="29" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{lectura_anterior}]]></expression>
+		</element>
+		<element kind="staticText" uuid="d0f13111-31d7-4f8e-be1e-8f95e6f70209" x="424" y="109" width="90" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[LECTURA ANTERIOR]]></text>
+		</element>
+		<element kind="staticText" uuid="39e167d5-0eca-44c4-a12b-cc7f7cc213c2" x="9" y="133" width="281" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[DESCRIPCIÓN]]></text>
+		</element>
+		<element kind="staticText" uuid="c21e93cd-d106-43a4-8eb7-c19680300295" x="291" y="133" width="252" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[DESCRIPCIÓN]]></text>
+		</element>
+		<element kind="staticText" uuid="15e7b402-448f-4326-b8c6-6e94726f8966" x="21" y="147" width="199" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[CARGO FIJO]]></text>
+		</element>
+		<element kind="textField" uuid="36368088-ae0d-419e-8558-78707c16b976" x="220" y="147" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{cargo_fijo}]]></expression>
+		</element>
+		<element kind="staticText" uuid="da9f41fb-2eb6-4767-9aab-6db81df7435a" x="21" y="159" width="199" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[CONSUMO]]></text>
+		</element>
+		<element kind="textField" uuid="1c1300b2-0182-4a9a-885d-23a196e8018d" x="220" y="159" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{valor_consumo}]]></expression>
+		</element>
+		<element kind="textField" uuid="684a8057-8867-410d-997b-e9f87af4bcfb" x="21" y="171" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "DEUDA ANTERIOR": ""]]></expression>
+		</element>
+		<element kind="textField" uuid="f4d8ea3e-962b-433f-81c3-a85e6abd4fe8" x="220" y="171" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{deuda_anterior}: ""]]></expression>
+		</element>
+		<element kind="textField" uuid="fcd18b85-7840-438d-9dd4-84a3967ba693" x="220" y="183" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{cuota_actual} != null? $P{cuota_actual}<=$P{numero_de_cuotas}? "$ " + $P{valor_cuota} : "-": ""]]></expression>
+		</element>
+		<element kind="textField" uuid="af68a857-7c9b-488e-9098-521eeb15ff25" x="21" y="183" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{cuota_actual} !=null ?($P{cuota_actual}<=$P{numero_de_cuotas}? $P{descripcion_cuota}
++ "(" +$P{numero_de_cuotas} + "/" + $P{cuota_actual} + ")"
+: "-"): ""]]></expression>
+		</element>
+		<element kind="textField" uuid="e51e1472-efa1-4ade-aeaf-1eea261e3c8c" x="21" y="195" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? $P{descripcion} : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="775f1268-11fd-4fcb-a0d7-d13946662c4c" x="220" y="195" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " +  $P{otros_cobros} : ""]]></expression>
+		</element>
+		<element kind="staticText" uuid="471b3214-212f-44f1-80e2-338daeb63b5f" x="293" y="147" width="189" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[CARGO FIJO]]></text>
+		</element>
+		<element kind="textField" uuid="308d31df-f396-4dc2-868b-dc5250761110" x="482" y="147" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{cargo_fijo}]]></expression>
+		</element>
+		<element kind="staticText" uuid="d15ecb9d-9cb5-4184-b076-6d99d500da33" x="293" y="159" width="189" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[CONSUMO]]></text>
+		</element>
+		<element kind="textField" uuid="a1406d0a-38f9-45de-aed1-d5599fe94819" x="482" y="159" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{valor_consumo}]]></expression>
+		</element>
+		<element kind="textField" uuid="f6f32803-7e15-4b74-8c22-d88ed660a54f" x="293" y="171" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "DEUDA ANTERIOR": ""]]></expression>
+		</element>
+		<element kind="textField" uuid="a6ad9f5f-586d-4aa4-a1b7-60aab40ea7f6" x="293" y="183" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{cuota_actual} !=null ?($P{cuota_actual}<=$P{numero_de_cuotas}? $P{descripcion_cuota}
++ "(" +$P{numero_de_cuotas} + "/" + $P{cuota_actual} + ")"
+: "-"): ""]]></expression>
+		</element>
+		<element kind="textField" uuid="d953e44b-11c2-4011-9c03-b0a2b219a29d" x="293" y="195" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? $P{descripcion} : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="ae2ea1dc-b24f-44d5-8f75-c4e5ccbd46b3" x="482" y="195" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{otros_cobros} : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="16a25789-a93b-4cc9-9c33-f16ed8124c6c" x="482" y="183" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{cuota_actual} != null? $P{cuota_actual}<=$P{numero_de_cuotas}? "$ " + $P{valor_cuota} : "-": ""]]></expression>
+		</element>
+		<element kind="textField" uuid="27812068-51bc-427c-af5d-f93f037c27e1" x="482" y="171" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{deuda_anterior}: ""]]></expression>
+		</element>
+		<element kind="staticText" uuid="8861b481-54ab-4068-9260-b365540acad1" x="10" y="227" width="210" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[TOTAL]]></text>
+		</element>
+		<element kind="textField" uuid="5654e82b-a5df-4d4e-b8ec-dd9df97a075a" x="222" y="227" width="68" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{total}]]></expression>
+		</element>
+		<element kind="staticText" uuid="0a13a7ea-85ae-4b74-a3b8-ee0be14da907" x="10" y="239" width="280" height="51" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede Duitama o
+corresponsales bancarios a nivel nacional. Recuerde reportar su pago al número
+3005641323 vía whatsapp
+]]></text>
+		</element>
+		<element kind="staticText" uuid="fc5f2551-8af4-4aa7-8682-fb9192a2e068" x="10" y="299" width="281" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[USUARIO]]></text>
+		</element>
+		<element kind="staticText" uuid="93ffc158-90f0-4d10-bdcf-7fd9325b08a4" x="290" y="227" width="192" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[TOTAL]]></text>
+		</element>
+		<element kind="textField" uuid="e8b77230-5ac5-41c8-aa63-40a9eeb6887f" x="482" y="227" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA["$ " + $P{total}]]></expression>
+		</element>
+		<element kind="staticText" uuid="094590c0-4736-4eaa-a053-7c1cd6394cc9" x="293" y="239" width="250" height="51" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede
+Duitama o corresponsales bancarios a nivel nacional. Recuerde
+reportar su pago al número 3005641323 vía whatsapp]]></text>
+		</element>
+		<element kind="staticText" uuid="7ae2b5ee-a408-4a61-86e8-0f83ba2bc73e" x="291" y="299" width="252" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[ACUEDUCTO]]></text>
+		</element>
+		<element kind="textField" uuid="382b50c5-02e2-4286-8406-80fc718261a6" x="390" y="110" width="34" height="11" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{lectura_actual}]]></expression>
+		</element>
+		<element kind="textField" uuid="7db9275f-f8cf-43f2-8729-2a467f383910" x="21" y="210" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "No Pago" : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="dacda8c9-9197-4804-aace-6bc3d9456952" x="221" y="210" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[ $P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{no_pago} : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="f72f0b72-5509-4e0c-b2b7-eaeb3540180d" x="292" y="210" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "No Pago" : ""]]></expression>
+		</element>
+		<element kind="textField" uuid="d4ab7b0d-6e6f-47e9-8d5a-55e0ba9593e0" x="482" y="210" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{no_pago} : ""]]></expression>
+		</element>
+		<element kind="staticText" uuid="c0c6ba97-5f88-4cff-acdc-91ecebc9fafb" x="111" y="73" width="29" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[MES]]></text>
+		</element>
+		<element kind="textField" uuid="129bc818-5702-4004-a116-8171241f4097" x="140" y="73" width="50" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{mes}]]></expression>
+		</element>
+		<element kind="rectangle" uuid="a575ad94-0cbd-47e9-a45e-83e897f13668" x="379" y="73" width="30" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="rectangle" uuid="2128a7b5-9ff7-4ece-b8b3-041d28933a62" x="409" y="73" width="50" height="12">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="ada08bbb-33d9-4f15-959a-ca824ba53def" x="379" y="73" width="30" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[MES]]></text>
+		</element>
+		<element kind="textField" uuid="10c7faf2-d9d7-48f1-a60a-838c90deac12" x="409" y="73" width="50" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[$P{mes}]]></expression>
+		</element>
+	</title>
+</jasperReport>

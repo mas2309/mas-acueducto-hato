@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude EI (Expose Internal) warnings for JPA entities -->
+    <Match>
+        <Class name="~.*\.entity\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude EI warnings for DTOs -->
+    <Match>
+        <Class name="~.*\.dto\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude EI warnings for exception classes -->
+    <Match>
+        <Class name="~.*\.exception\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude Lombok generated code -->
+    <Match>
+        <Class name="~.*\$.*Builder"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude EI warnings for service implementations with EntityManager -->
+    <Match>
+        <Class name="~.*\.service\.impl\..*"/>
+        <Field name="entityManager"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude Struts Actions: EI/EI2 and Serializable warnings are inherent to Struts framework -->
+    <Match>
+        <Class name="~.*\.web\.action\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,SE_BAD_FIELD,SE_BAD_FIELD_STORE"/>
+    </Match>
+
+    <!-- Exclude EI2 for Spring @Configuration classes with injected config objects -->
+    <Match>
+        <Class name="~.*\.service\.impl\.EstadoFacturaService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude EI2 for service implementations with injected interfaces -->
+    <Match>
+        <Class name="~.*\.service\.impl\.GastoServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude boxing warnings in PDF service -->
+    <Match>
+        <Class name="~.*\.service\.impl\.FacturaPdfService"/>
+        <Bug pattern="BX_UNBOXING_IMMEDIATELY_REBOXED"/>
+    </Match>
+
+    <!-- Exclude security module: Spring-managed beans and JPA entities -->
+    <Match>
+        <Class name="~.*\.security\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,CT_CONSTRUCTOR_THROW"/>
+    </Match>
+</FindBugsFilter>

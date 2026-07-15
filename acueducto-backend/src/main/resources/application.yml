@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: acueducto-backend-api
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  port: 8083
+
+spring.servlet.multipart:
+  enabled: true
+  max-file-size: 10MB
+  max-request-size: 10MB
+
+logging:
+  level:
+    com.mas.co: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Configuración de facturación
+acueducto:
+  facturacion:
+    dia-limite-pago: 20
+
+# Seguridad JWT
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:dGhpcyBpcyBhIHNlY3VyZSBrZXkgZm9yIGFjdWVkdWN0byBiYWNrZW5kIGFwaSBtYXMgZGV2ZWxvcG1lbnQ=}
+    access-token-expiration: 3600000
+    refresh-token-expiration: 604800000

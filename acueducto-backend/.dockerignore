@@ -1,0 +1,11 @@
+.gradle
+build/classes
+build/tmp
+build/reports
+build/generated
+.idea
+*.iml
+.git
+.gitignore
+*.md
+Acueducto_Backend_API.postman_collection.json

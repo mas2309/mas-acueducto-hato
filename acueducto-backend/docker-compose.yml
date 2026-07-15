@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=huawei
+      - url=jdbc:postgresql://<host-rds>:5432/acueducto_hato
+      - username=<usuario>
+      - password=<password>
+      - JAVA_OPTS=-Xms256m -Xmx512m

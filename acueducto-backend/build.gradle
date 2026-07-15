@@ -1,0 +1,149 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '6.0.7'
+    id 'jacoco'
+}
+
+group = 'com.mas.co'
+version = '0.0.1-SNAPSHOT'
+description = 'acueducto-backend'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-taglibs'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // Struts 2 + Spring integration
+    implementation 'org.apache.struts:struts2-core:7.1.1'
+    implementation 'org.apache.struts:struts2-spring-plugin:7.1.1'
+    implementation 'org.apache.struts:struts2-convention-plugin:7.1.1'
+
+    // JSP support for embedded Tomcat
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+
+    // JasperReports para generación de facturas PDF
+    implementation 'net.sf.jasperreports:jasperreports:7.0.0'
+    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.0'
+
+    // Apache POI para exportación Excel
+    implementation 'org.apache.poi:poi:5.2.5'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Huawei Cloud CSMS SDK (DEW - Secret Management)
+    implementation 'com.huaweicloud.sdk:huaweicloud-sdk-csms:3.1.72'
+
+    // Huawei Cloud OBS SDK
+    implementation 'com.huaweicloud:esdk-obs-java-bundle:3.24.3'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // MapStruct for mapping
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // OpenAPI/Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // Development
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
+
+    // Test containers BOM
+    testImplementation platform('org.testcontainers:testcontainers-bom:1.19.3')
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// Checkstyle configuration
+checkstyle {
+    toolVersion = '10.12.4'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+// SpotBugs configuration
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = true
+    effort = 'max'
+    reportLevel = 'medium'
+    excludeFilter = file('config/spotbugs/excludeFilter.xml')
+}
+
+// Jacoco configuration
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+// Quality gate
+task qualityGate {
+    dependsOn check, jacocoTestCoverageVerification
+}
+
+// Configure annotation processors order
+compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}

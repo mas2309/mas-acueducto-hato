@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 6.0//EN"
+    "https://struts.apache.org/dtds/struts-6.0.dtd">
+
+<struts>
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.objectFactory" value="spring"/>
+    <constant name="struts.action.extension" value="action"/>
+    <constant name="struts.mapper.alwaysSelectFullNamespace" value="true"/>
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.multipart.maxSize" value="10485760"/>
+    <constant name="struts.allowlist.packageNames" value="com.mas.co.dto,com.mas.co.web.action,com.mas.co.security,com.mas.co.entity.enums,java.util,java.lang"/>
+
+    <package name="admin" namespace="/admin" extends="struts-default">
+
+        <default-action-ref name="dashboard"/>
+
+        <action name="dashboard" class="dashboardAction">
+            <result>/WEB-INF/views/admin/dashboard.jsp</result>
+        </action>
+
+        <!-- Usuarios CRUD -->
+        <action name="usuarios" class="usuarioAction" method="listar">
+            <result>/WEB-INF/views/admin/usuarios/lista.jsp</result>
+        </action>
+
+        <action name="usuario-formulario" class="usuarioAction" method="formulario">
+            <result>/WEB-INF/views/admin/usuarios/formulario.jsp</result>
+        </action>
+
+        <action name="usuario-guardar" class="usuarioAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">usuarios</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/usuarios/formulario.jsp</result>
+        </action>
+
+        <action name="usuario-eliminar" class="usuarioAction" method="eliminar">
+            <result type="redirectAction">
+                <param name="actionName">usuarios</param>
+            </result>
+        </action>
+
+        <action name="usuario-desactivar" class="usuarioAction" method="desactivar">
+            <result type="redirectAction">
+                <param name="actionName">usuarios</param>
+            </result>
+        </action>
+
+        <!-- Cuotas CRUD -->
+        <action name="cuotas" class="cuotaAction" method="listar">
+            <result>/WEB-INF/views/admin/cuotas/lista.jsp</result>
+        </action>
+
+        <action name="cuota-formulario" class="cuotaAction" method="formulario">
+            <result>/WEB-INF/views/admin/cuotas/formulario.jsp</result>
+        </action>
+
+        <action name="cuota-guardar" class="cuotaAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">cuotas</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/cuotas/formulario.jsp</result>
+        </action>
+
+        <action name="cuota-eliminar" class="cuotaAction" method="eliminar">
+            <result type="redirectAction">
+                <param name="actionName">cuotas</param>
+            </result>
+        </action>
+
+        <action name="cuota-desactivar" class="cuotaAction" method="desactivar">
+            <result type="redirectAction">
+                <param name="actionName">cuotas</param>
+            </result>
+        </action>
+
+        <action name="cuota-pago" class="cuotaAction" method="procesarPago">
+            <result type="redirectAction">
+                <param name="actionName">cuotas</param>
+            </result>
+        </action>
+
+        <!-- Lecturas / Facturas -->
+        <action name="facturas" class="lecturaAction" method="listar">
+            <result>/WEB-INF/views/admin/lecturas/lista.jsp</result>
+        </action>
+
+        <action name="lectura-formulario" class="lecturaAction" method="formulario">
+            <result>/WEB-INF/views/admin/lecturas/formulario.jsp</result>
+        </action>
+
+        <action name="lectura-ingresar" class="lecturaAction" method="ingresar">
+            <result type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/lecturas/formulario.jsp</result>
+        </action>
+
+        <action name="factura-pagar" class="lecturaAction" method="pagar">
+            <result type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
+        </action>
+
+        <action name="factura-eliminar" class="lecturaAction" method="eliminar">
+            <result type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
+        </action>
+
+        <action name="factura-detalle" class="lecturaAction" method="detalle">
+            <result>/WEB-INF/views/admin/lecturas/detalle.jsp</result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
+        </action>
+
+        <action name="factura-pdf" class="lecturaAction" method="descargarPdf">
+            <result type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">pdfStream</param>
+                <param name="contentDisposition">attachment;filename="${pdfFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
+        </action>
+
+        <!-- Informes -->
+        <action name="informes" class="informeAction" method="ver">
+            <result>/WEB-INF/views/admin/informes/dashboard.jsp</result>
+        </action>
+
+        <action name="informes-excel" class="informeAction" method="exportarExcel">
+            <result type="stream">
+                <param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="inputName">excelStream</param>
+                <param name="contentDisposition">attachment;filename="${excelFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">informes</param>
+            </result>
+        </action>
+
+        <!-- Usuarios Administrativos -->
+        <action name="admin-users" class="adminUserAction" method="listar">
+            <result>/WEB-INF/views/admin/admin-users/lista.jsp</result>
+        </action>
+
+        <action name="admin-user-formulario" class="adminUserAction" method="formulario">
+            <result>/WEB-INF/views/admin/admin-users/formulario.jsp</result>
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">admin-users</param>
+            </result>
+        </action>
+
+        <action name="admin-user-guardar" class="adminUserAction" method="guardar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">admin-users</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/admin-users/formulario.jsp</result>
+        </action>
+
+        <action name="admin-user-eliminar" class="adminUserAction" method="eliminar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">admin-users</param>
+            </result>
+        </action>
+
+        <!-- Ingresos -->
+        <action name="ingresos" class="ingresoFinanzasAction" method="listar">
+            <result>/WEB-INF/views/admin/finanzas/ingresos-lista.jsp</result>
+        </action>
+
+        <action name="ingreso-formulario" class="ingresoFinanzasAction" method="formulario">
+            <result>/WEB-INF/views/admin/finanzas/ingreso-formulario.jsp</result>
+        </action>
+
+        <action name="ingreso-guardar" class="ingresoFinanzasAction" method="guardar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">ingresos</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/finanzas/ingreso-formulario.jsp</result>
+        </action>
+
+        <action name="ingreso-eliminar" class="ingresoFinanzasAction" method="eliminar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">ingresos</param>
+            </result>
+        </action>
+
+        <action name="ingresos-excel" class="ingresoFinanzasAction" method="exportarExcel">
+            <result type="stream">
+                <param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="inputName">excelStream</param>
+                <param name="contentDisposition">attachment;filename="${excelFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">ingresos</param>
+            </result>
+        </action>
+
+        <!-- Gastos -->
+        <action name="gastos" class="gastoFinanzasAction" method="listar">
+            <result>/WEB-INF/views/admin/finanzas/gastos-lista.jsp</result>
+        </action>
+
+        <action name="gasto-formulario" class="gastoFinanzasAction" method="formulario">
+            <result>/WEB-INF/views/admin/finanzas/gasto-formulario.jsp</result>
+        </action>
+
+        <action name="gasto-guardar" class="gastoFinanzasAction" method="guardar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">gastos</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/finanzas/gasto-formulario.jsp</result>
+        </action>
+
+        <action name="gasto-eliminar" class="gastoFinanzasAction" method="eliminar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">gastos</param>
+            </result>
+        </action>
+
+        <action name="gasto-pagar" class="gastoFinanzasAction" method="pagar">
+            <result name="redirect" type="redirectAction">
+                <param name="actionName">gastos</param>
+            </result>
+        </action>
+
+        <action name="gastos-excel" class="gastoFinanzasAction" method="exportarExcel">
+            <result type="stream">
+                <param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="inputName">excelStream</param>
+                <param name="contentDisposition">attachment;filename="${excelFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">gastos</param>
+            </result>
+        </action>
+
+    </package>
+
+</struts>
