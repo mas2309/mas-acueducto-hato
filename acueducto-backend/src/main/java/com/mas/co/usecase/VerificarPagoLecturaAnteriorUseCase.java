@@ -1,6 +1,5 @@
 package com.mas.co.usecase;
 
-import com.mas.co.entity.Factura;
 import com.mas.co.repository.FacturaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,9 +20,8 @@ public class VerificarPagoLecturaAnteriorUseCase {
      * @return {@code true} si no hay factura anterior o si la última factura fue pagada. {@code false} en caso contrario.
      */
     public boolean execute(Long usuarioId) {
-        return facturaRepository.findUltimaLecturaPorUsuario(usuarioId).stream()
-            .findFirst()
-            .map(Factura::isPagada)
-            .orElse(true); // Si no hay factura anterior, se considera pagada para no aplicar cargos indebidos.
+        // Consulta directamente en BD si la última factura está pagada (LIMIT 1)
+        return facturaRepository.findUltimaFacturaPagada(usuarioId)
+            .orElse(true); // Sin factura anterior = no aplica cargo
     }
 }

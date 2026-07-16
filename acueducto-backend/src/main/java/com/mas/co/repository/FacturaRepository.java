@@ -63,7 +63,7 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     Page<Factura> findFacturasPagadas(Pageable pageable);
 
     /**
-     * Obtiene la última lectura de un usuario.
+     * Obtiene la última factura de un usuario ordenada por año y mes descendente.
      */
     @Query("SELECT f FROM Factura f WHERE f.usuario.id = :usuarioId ORDER BY f.anio DESC, " +
            "CASE f.mes " +
@@ -74,11 +74,36 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     List<Factura> findUltimaLecturaPorUsuario(@Param("usuarioId") Long usuarioId);
 
     /**
+     * Obtiene únicamente la última factura de un usuario (LIMIT 1 en BD).
+     */
+    @Query(value = "SELECT * FROM acueducto.facturas f WHERE f.usuario_id = :usuarioId " +
+           "ORDER BY f.anio DESC, " +
+           "CASE f.mes " +
+           "WHEN 'Enero' THEN 1 WHEN 'Febrero' THEN 2 WHEN 'Marzo' THEN 3 WHEN 'Abril' THEN 4 " +
+           "WHEN 'Mayo' THEN 5 WHEN 'Junio' THEN 6 WHEN 'Julio' THEN 7 WHEN 'Agosto' THEN 8 " +
+           "WHEN 'Septiembre' THEN 9 WHEN 'Octubre' THEN 10 WHEN 'Noviembre' THEN 11 WHEN 'Diciembre' THEN 12 " +
+           "END DESC LIMIT 1", nativeQuery = true)
+    Optional<Factura> findUltimaFacturaPorUsuario(@Param("usuarioId") Long usuarioId);
+
+    /**
      * Obtiene deuda pendiente de un usuario.
      */
     @Query("SELECT COALESCE(SUM(f.valorTotal), 0.0) FROM Factura f WHERE f.usuario.id = :usuarioId " +
            "AND f.pago = false AND f.pagoBanco = false")
     Double findDeudaPendientePorUsuario(@Param("usuarioId") Long usuarioId);
+
+    /**
+     * Verifica si la última factura de un usuario está pagada (por efectivo o banco).
+     */
+    @Query(value = "SELECT CASE WHEN (f.pago = true OR f.pago_banco = true) THEN true ELSE false END " +
+           "FROM acueducto.facturas f WHERE f.usuario_id = :usuarioId " +
+           "ORDER BY f.anio DESC, " +
+           "CASE f.mes " +
+           "WHEN 'Enero' THEN 1 WHEN 'Febrero' THEN 2 WHEN 'Marzo' THEN 3 WHEN 'Abril' THEN 4 " +
+           "WHEN 'Mayo' THEN 5 WHEN 'Junio' THEN 6 WHEN 'Julio' THEN 7 WHEN 'Agosto' THEN 8 " +
+           "WHEN 'Septiembre' THEN 9 WHEN 'Octubre' THEN 10 WHEN 'Noviembre' THEN 11 WHEN 'Diciembre' THEN 12 " +
+           "END DESC LIMIT 1", nativeQuery = true)
+    Optional<Boolean> findUltimaFacturaPagada(@Param("usuarioId") Long usuarioId);
 
     /**
      * Busca facturas por término en nombre de usuario.
