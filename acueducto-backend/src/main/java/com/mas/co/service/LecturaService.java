@@ -14,6 +14,23 @@ import org.springframework.data.domain.Pageable;
 public interface LecturaService {
 
     /**
+     * Obtiene facturas por año paginadas.
+     *
+     * @param anio año de consulta
+     * @param pageable información de paginación
+     * @return página de facturas del año
+     */
+    Page<LecturaDto> obtenerFacturasPorAnio(Integer anio, Pageable pageable);
+
+    /**
+     * Obtiene facturas vencidas paginadas.
+     *
+     * @param pageable información de paginación
+     * @return página de facturas vencidas
+     */
+    Page<LecturaDto> obtenerFacturasVencidas(Pageable pageable);
+
+    /**
      * Obtiene todas las facturas paginadas ordenadas por creación.
      * 
      * @param pageable información de paginación

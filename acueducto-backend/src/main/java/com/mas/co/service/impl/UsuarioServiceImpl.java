@@ -8,6 +8,8 @@ import com.mas.co.repository.UsuarioRepository;
 import com.mas.co.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "usuariosActivos", allEntries = true)
     public UsuarioDto crearUsuario(UsuarioDto usuarioDto) {
         log.debug("Creando usuario: {}", usuarioDto.getNombre());
         
@@ -54,6 +57,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "usuariosActivos", allEntries = true)
     public UsuarioDto actualizarUsuario(Long id, UsuarioDto usuarioDto) {
         log.debug("Actualizando usuario con ID: {}", id);
         
@@ -69,6 +73,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "usuariosActivos", allEntries = true)
     public void desactivarUsuario(Long id) {
         log.debug("Desactivando usuario con ID: {}", id);
         
@@ -83,6 +88,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "usuariosActivos", allEntries = true)
     public void eliminarUsuario(Long id) {
         log.debug("Eliminando usuario con ID: {}", id);
         
@@ -114,6 +120,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Cacheable("usuariosActivos")
     public List<UsuarioDto> obtenerUsuariosActivos() {
         log.debug("Obteniendo todos los usuarios activos");
         

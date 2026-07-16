@@ -1,5 +1,6 @@
 package com.mas.co.service.impl;
 
+import com.mas.co.config.CacheConfig;
 import com.mas.co.entity.Valores;
 import com.mas.co.repository.ValorRepository;
 import com.mas.co.service.ValorService;
@@ -24,7 +25,7 @@ public class ValorServiceImpl implements ValorService {
   private final ValorRepository valorRepository;
 
   @Override
-  @Cacheable("valores")
+  @Cacheable(CacheConfig.CACHE_VALORES)
   public Valores obtenerValores() {
     return valorRepository.findFirstByOrderByIdDesc().orElseGet(this::obtenerValoresPorDefecto);
   }

@@ -51,10 +51,21 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     Page<Factura> findByMesAndAnioOrderByFechaIngresoDesc(String mes, Integer anio, Pageable pageable);
 
     /**
+     * Obtiene facturas por año ordenadas por ID descendente.
+     */
+    Page<Factura> findByAnioOrderByIdDesc(Integer anio, Pageable pageable);
+
+    /**
      * Obtiene facturas pendientes de pago.
      */
     @Query("SELECT f FROM Factura f WHERE f.pago = false AND f.pagoBanco = false ORDER BY f.fechaIngreso DESC")
     Page<Factura> findFacturasPendientes(Pageable pageable);
+
+    /**
+     * Obtiene facturas vencidas (pendientes de pago con fecha de ingreso anterior al mes actual).
+     */
+    @Query("SELECT f FROM Factura f WHERE f.pago = false AND f.pagoBanco = false AND f.fechaIngreso < :fechaCorte ORDER BY f.fechaIngreso DESC")
+    Page<Factura> findFacturasVencidas(@Param("fechaCorte") java.time.LocalDate fechaCorte, Pageable pageable);
 
     /**
      * Obtiene facturas pagadas.
