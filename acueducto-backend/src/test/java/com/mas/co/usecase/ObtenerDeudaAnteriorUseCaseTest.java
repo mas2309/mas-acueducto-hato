@@ -5,8 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.mas.co.entity.Factura;
 import com.mas.co.repository.FacturaRepository;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,11 +29,9 @@ class ObtenerDeudaAnteriorUseCaseTest {
     factura.setPago(false);
     factura.setPagoBanco(false);
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura));
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    Double deuda = useCase.execute(1L);
-
-    assertEquals(50000.0, deuda);
+    assertEquals(50000.0, useCase.execute(1L));
   }
 
   @Test
@@ -45,11 +42,9 @@ class ObtenerDeudaAnteriorUseCaseTest {
     factura.setPago(true);
     factura.setPagoBanco(false);
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura));
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    Double deuda = useCase.execute(1L);
-
-    assertEquals(0.0, deuda);
+    assertEquals(0.0, useCase.execute(1L));
   }
 
   @Test
@@ -60,40 +55,29 @@ class ObtenerDeudaAnteriorUseCaseTest {
     factura.setPago(false);
     factura.setPagoBanco(true);
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura));
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    Double deuda = useCase.execute(1L);
-
-    assertEquals(0.0, deuda);
+    assertEquals(0.0, useCase.execute(1L));
   }
 
   @Test
   @DisplayName("Debe retornar cero cuando no hay facturas anteriores")
   void debeRetornarCeroCuandoNoHayFacturasAnteriores() {
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(Collections.emptyList());
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.empty());
 
-    Double deuda = useCase.execute(1L);
-
-    assertEquals(0.0, deuda);
+    assertEquals(0.0, useCase.execute(1L));
   }
 
   @Test
   @DisplayName("Debe considerar solo la primera factura de la lista")
   void debeConsiderarSoloPrimeraFactura() {
-    Factura factura1 = new Factura();
-    factura1.setValorTotal(50000.0);
-    factura1.setPago(false);
-    factura1.setPagoBanco(false);
+    Factura factura = new Factura();
+    factura.setValorTotal(50000.0);
+    factura.setPago(false);
+    factura.setPagoBanco(false);
 
-    Factura factura2 = new Factura();
-    factura2.setValorTotal(30000.0);
-    factura2.setPago(false);
-    factura2.setPagoBanco(false);
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura1, factura2));
-
-    Double deuda = useCase.execute(1L);
-
-    assertEquals(50000.0, deuda);
+    assertEquals(50000.0, useCase.execute(1L));
   }
 }

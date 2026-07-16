@@ -5,8 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.mas.co.entity.Factura;
 import com.mas.co.repository.FacturaRepository;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,36 +27,27 @@ class ObtenerLecturaAnteriorUseCaseTest {
     Factura factura = new Factura();
     factura.setLecturaActual(150);
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura));
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    Integer resultado = useCase.execute(1L);
-
-    assertEquals(150, resultado);
+    assertEquals(150, useCase.execute(1L));
   }
 
   @Test
   @DisplayName("Debe retornar cero cuando no hay facturas anteriores")
   void debeRetornarCeroCuandoNoHayFacturas() {
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(Collections.emptyList());
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.empty());
 
-    Integer resultado = useCase.execute(1L);
-
-    assertEquals(0, resultado);
+    assertEquals(0, useCase.execute(1L));
   }
 
   @Test
   @DisplayName("Debe considerar solo la primera factura")
   void debeConsiderarSoloPrimeraFactura() {
-    Factura factura1 = new Factura();
-    factura1.setLecturaActual(150);
+    Factura factura = new Factura();
+    factura.setLecturaActual(150);
 
-    Factura factura2 = new Factura();
-    factura2.setLecturaActual(100);
+    when(facturaRepository.findUltimaFacturaPorUsuario(1L)).thenReturn(Optional.of(factura));
 
-    when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of(factura1, factura2));
-
-    Integer resultado = useCase.execute(1L);
-
-    assertEquals(150, resultado);
+    assertEquals(150, useCase.execute(1L));
   }
 }
