@@ -21,8 +21,7 @@ public class ObtenerLecturaAnteriorUseCase {
      * @return El valor de la lectura actual de la última factura, o 0 si no hay facturas.
      */
     public Integer execute(Long usuarioId) {
-        return facturaRepository.findUltimaLecturaPorUsuario(usuarioId).stream()
-            .findFirst()
+        return facturaRepository.findUltimaFacturaPorUsuario(usuarioId)
             .map(Factura::getLecturaActual)
             .orElse(0);
     }

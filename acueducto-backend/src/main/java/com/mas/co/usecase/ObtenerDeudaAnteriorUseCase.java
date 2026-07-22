@@ -21,9 +21,8 @@ public class ObtenerDeudaAnteriorUseCase {
      * @return El valor total de la última factura si no está pagada; de lo contrario, 0.0.
      */
     public Double execute(Long usuarioId) {
-        return facturaRepository.findUltimaLecturaPorUsuario(usuarioId).stream()
-            .findFirst()
-            .filter(f -> !f.isPagada()) // Considerar solo si la última factura NO está pagada
+        return facturaRepository.findUltimaFacturaPorUsuario(usuarioId)
+            .filter(f -> !f.isPagada())
             .map(Factura::getValorTotal)
             .orElse(0.0);
     }

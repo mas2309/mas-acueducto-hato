@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://101.44.3.153:5433/acueductos_db"
-    username: acueducto
-    password: "Acueductos23@"
+    url: "jdbc:postgresql://localhost:5432/acueducto_hato"
+    username: postgres
+    password: "Mas23"
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

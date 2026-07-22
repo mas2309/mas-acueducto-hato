@@ -61,6 +61,19 @@ public class LecturaServiceImpl implements LecturaService {
   }
 
   @Override
+  public Page<LecturaDto> obtenerFacturasPorAnio(Integer anio, Pageable pageable) {
+    log.debug("Obteniendo facturas del año: {}", anio);
+    return facturaRepository.findByAnioOrderByIdDesc(anio, pageable).map(lecturaMapper::toDto);
+  }
+
+  @Override
+  public Page<LecturaDto> obtenerFacturasVencidas(Pageable pageable) {
+    log.debug("Obteniendo facturas vencidas");
+    java.time.LocalDate primerDiaMesActual = java.time.LocalDate.now().withDayOfMonth(1);
+    return facturaRepository.findFacturasVencidas(primerDiaMesActual, pageable).map(lecturaMapper::toDto);
+  }
+
+  @Override
   public Page<LecturaDto> obtenerTodasFacturas(Pageable pageable) {
     log.debug("Obteniendo todas las facturas paginadas");
     return facturaRepository.findAllByOrderByIdDesc(pageable).map(lecturaMapper::toDto);

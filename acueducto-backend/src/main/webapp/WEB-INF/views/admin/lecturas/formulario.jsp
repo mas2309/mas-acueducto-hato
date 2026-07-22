@@ -118,9 +118,9 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="otrosCobrosDescripcion" class="form-label">Descripci&oacute;n</label>
-                    <s:textfield name="lectura.otrosCobrosDescripcion" value="%{lectura.otrosCobrosDescripcion}"
-                                 id="otrosCobrosDescripcion" cssClass="form-control"
-                                 placeholder="Ej: Reconexión"/>
+                    <input type="text" name="lectura.otrosCobrosDescripcion" id="otrosCobrosDescripcion"
+                           value="<s:property value='lectura.otrosCobrosDescripcion'/>"
+                           class="form-control" placeholder="Ej: Reconexión"/>
                 </div>
             </div>
 

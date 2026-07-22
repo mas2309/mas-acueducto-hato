@@ -81,6 +81,10 @@ dependencies {
     // OpenAPI/Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
+    // Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

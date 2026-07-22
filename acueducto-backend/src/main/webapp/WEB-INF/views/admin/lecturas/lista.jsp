@@ -51,6 +51,17 @@
 
             <%-- Búsqueda --%>
             <form id="searchForm" action="<s:url namespace='/admin' action='facturas'/>" method="get" class="d-flex gap-2 ms-auto flex-wrap">
+                <%-- Selector de año (solo visible en vista general) --%>
+                <s:if test='filtro == null || filtro == ""'>
+                    <select name="anioFiltro" class="form-control form-control-sm" style="width:90px;"
+                            onchange="this.form.submit()">
+                        <s:iterator begin="%{anioFiltro - 3}" end="%{anioFiltro}" var="a">
+                            <option value="<s:property value='#a'/>" <s:if test="#a == anioFiltro">selected</s:if>>
+                                <s:property value="#a"/>
+                            </option>
+                        </s:iterator>
+                    </select>
+                </s:if>
                 <div class="search-box">
                     <i class="bi bi-search search-icon"></i>
                     <input type="text" id="searchInput" name="q" value="<s:property value='q'/>" class="form-control"
@@ -208,6 +219,7 @@
                                             <s:param name='size' value='%{size}'/>
                                             <s:param name='q' value='%{q}'/>
                                             <s:param name='filtro' value='%{filtro}'/>
+                                            <s:param name='anioFiltro' value='%{anioFiltro}'/>
                                          </s:url>">
                                     <i class="bi bi-chevron-left"></i>
                                 </a>
@@ -219,7 +231,7 @@
                             </li>
                         </s:else>
 
-                        <s:iterator begin="0" end="%{totalPages - 1}" var="i">
+                        <s:iterator begin="%{[page - 2] > 0 ? page - 2 : 0}" end="%{[page + 2] < totalPages - 1 ? page + 2 : totalPages - 1}" var="i">
                             <s:if test="#i == page">
                                 <li class="page-item active">
                                     <span class="page-link"><s:property value="#i + 1"/></span>
@@ -233,6 +245,7 @@
                                                 <s:param name='size' value='%{size}'/>
                                                 <s:param name='q' value='%{q}'/>
                                                 <s:param name='filtro' value='%{filtro}'/>
+                                                <s:param name='anioFiltro' value='%{anioFiltro}'/>
                                              </s:url>">
                                         <s:property value="#i + 1"/>
                                     </a>
@@ -248,6 +261,7 @@
                                             <s:param name='size' value='%{size}'/>
                                             <s:param name='q' value='%{q}'/>
                                             <s:param name='filtro' value='%{filtro}'/>
+                                            <s:param name='anioFiltro' value='%{anioFiltro}'/>
                                          </s:url>">
                                     <i class="bi bi-chevron-right"></i>
                                 </a>
