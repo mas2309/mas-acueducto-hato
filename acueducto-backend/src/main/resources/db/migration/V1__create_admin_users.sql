@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS acueducto;
+
 -- Tabla de usuarios administrativos del sistema
 CREATE TABLE IF NOT EXISTS acueducto.admin_users (
     id BIGSERIAL PRIMARY KEY,
