@@ -84,6 +84,7 @@ jobs:
             NETWORK="mas-network"
 
             docker network create $NETWORK 2>/dev/null || true
+            docker network connect $NETWORK global-mas-postgres 2>/dev/null || true
 
             docker stop $CONTAINER 2>/dev/null || true
             docker rm $CONTAINER 2>/dev/null || true
@@ -97,6 +98,8 @@ jobs:
               --name $CONTAINER \
               --restart unless-stopped \
               --network $NETWORK \
+              -p ${{ vars.HOST_PORT }}:8084 \
+              -e TZ=America/Bogota \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
