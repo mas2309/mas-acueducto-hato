@@ -97,6 +97,20 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     Optional<Factura> findUltimaFacturaPorUsuario(@Param("usuarioId") Long usuarioId);
 
     /**
+     * Obtiene la última factura de CADA usuario (una fila por usuario_id).
+     * Se usa para precargar el histórico reciente en el cliente móvil y permitir
+     * validar la consecutividad del período también en modo offline.
+     */
+    @Query(value = "SELECT DISTINCT ON (f.usuario_id) f.* FROM acueducto.facturas f " +
+           "ORDER BY f.usuario_id, f.anio DESC, " +
+           "CASE f.mes " +
+           "WHEN 'Enero' THEN 1 WHEN 'Febrero' THEN 2 WHEN 'Marzo' THEN 3 WHEN 'Abril' THEN 4 " +
+           "WHEN 'Mayo' THEN 5 WHEN 'Junio' THEN 6 WHEN 'Julio' THEN 7 WHEN 'Agosto' THEN 8 " +
+           "WHEN 'Septiembre' THEN 9 WHEN 'Octubre' THEN 10 WHEN 'Noviembre' THEN 11 WHEN 'Diciembre' THEN 12 " +
+           "END DESC", nativeQuery = true)
+    List<Factura> findUltimasFacturasPorUsuario();
+
+    /**
      * Obtiene deuda pendiente de un usuario.
      */
     @Query("SELECT COALESCE(SUM(f.valorTotal), 0.0) FROM Factura f WHERE f.usuario.id = :usuarioId " +

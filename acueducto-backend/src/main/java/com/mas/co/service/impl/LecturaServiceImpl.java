@@ -18,6 +18,7 @@ import com.mas.co.usecase.ObtenerDeudaAnteriorUseCase;
 import com.mas.co.usecase.ObtenerLecturaAnteriorUseCase;
 import com.mas.co.usecase.ValidarPeriodoConsecutivoUseCase;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -171,6 +172,14 @@ public class LecturaServiceImpl implements LecturaService {
   public LecturaDto obtenerUltimaLectura(Long usuarioId) {
     log.debug("Obteniendo última lectura del usuario: {}", usuarioId);
     return facturaRepository.findUltimaLecturaPorUsuario(usuarioId).stream().findFirst().map(lecturaMapper::toDto).orElse(LecturaDto.builder().usuarioId(usuarioId).lecturaAnterior(0).build());
+  }
+
+  @Override
+  public List<LecturaDto> obtenerUltimasLecturas() {
+    log.debug("Obteniendo última lectura de todos los usuarios");
+    return facturaRepository.findUltimasFacturasPorUsuario().stream()
+        .map(lecturaMapper::toDto)
+        .toList();
   }
 
   @Override
