@@ -33,7 +33,7 @@
             </h5>
         </div>
 
-        <s:form namespace="/admin" action="ingreso-guardar" method="post">
+        <s:form namespace="/admin" action="ingreso-guardar" method="post" theme="simple">
             <s:hidden name="ingreso.id" value="%{ingreso.id}"/>
 
             <div class="mb-3">

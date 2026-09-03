@@ -44,7 +44,7 @@
             </p>
         </div>
 
-        <s:form namespace="/admin" action="lectura-ingresar" method="post">
+        <s:form namespace="/admin" action="lectura-ingresar" method="post" theme="simple">
 
             <%-- Usuario --%>
             <div class="mb-3">

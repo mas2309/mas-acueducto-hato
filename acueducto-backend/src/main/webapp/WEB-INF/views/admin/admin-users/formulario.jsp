@@ -46,7 +46,7 @@
             </p>
         </div>
 
-        <s:form namespace="/admin" action="admin-user-guardar" method="post">
+        <s:form namespace="/admin" action="admin-user-guardar" method="post" theme="simple">
             <s:hidden name="adminUser.id" value="%{adminUser.id}"/>
 
             <div class="mb-3">
