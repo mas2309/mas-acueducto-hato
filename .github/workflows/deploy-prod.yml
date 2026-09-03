@@ -12,6 +12,9 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: acueducto-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -39,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: build/reports/
+          path: acueducto-backend/build/reports/
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -58,6 +61,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        working-directory: acueducto-backend
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           docker build -t ${{ env.IMAGE }}:$TAG -t ${{ env.IMAGE }}:latest .
@@ -80,6 +84,7 @@ jobs:
             NETWORK="mas-network"
 
             docker network create $NETWORK 2>/dev/null || true
+            docker network connect $NETWORK global-mas-postgres 2>/dev/null || true
 
             docker stop $CONTAINER 2>/dev/null || true
             docker rm $CONTAINER 2>/dev/null || true
@@ -93,6 +98,8 @@ jobs:
               --name $CONTAINER \
               --restart unless-stopped \
               --network $NETWORK \
+              -p ${{ vars.HOST_PORT }}:8084 \
+              -e TZ=America/Bogota \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \

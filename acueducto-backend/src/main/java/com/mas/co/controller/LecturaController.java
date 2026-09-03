@@ -77,6 +77,17 @@ public class LecturaController {
     return ResponseEntity.ok(ApiResponse.success(ultimaLectura));
   }
 
+  @GetMapping("/ultimas")
+  @Operation(
+      summary = "Últimas lecturas de todos los usuarios",
+      description = "Obtiene la última factura registrada de cada usuario. Usado para precargar "
+          + "el histórico en el cliente móvil y habilitar validaciones offline")
+  public ResponseEntity<ApiResponse<List<LecturaDto>>> obtenerUltimasLecturas() {
+
+    List<LecturaDto> ultimasLecturas = lecturaService.obtenerUltimasLecturas();
+    return ResponseEntity.ok(ApiResponse.success(ultimasLecturas));
+  }
+
   @GetMapping("/usuario/{usuarioId}")
   @Operation(
       summary = "Facturas por usuario",

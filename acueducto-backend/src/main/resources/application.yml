@@ -15,6 +15,14 @@ spring.servlet.multipart:
   max-file-size: 10MB
   max-request-size: 10MB
 
+spring.flyway:
+  enabled: true
+  schemas: acueducto
+  default-schema: acueducto
+  baseline-on-migrate: true
+  baseline-version: "2"
+  baseline-description: "Esquema existente previo a Flyway"
+
 logging:
   level:
     com.mas.co: DEBUG

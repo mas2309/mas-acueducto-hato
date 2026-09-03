@@ -14,7 +14,8 @@ import org.springframework.test.context.TestPropertySource;
       "spring.datasource.password=",
       "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
       "spring.jpa.hibernate.ddl-auto=create-drop",
-      "spring.jpa.show-sql=false"
+      "spring.jpa.show-sql=false",
+      "spring.flyway.enabled=false"
     })
 class AcueductoBackendApplicationTests {
 

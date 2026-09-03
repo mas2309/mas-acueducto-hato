@@ -2,6 +2,7 @@ package com.mas.co.service;
 
 import com.mas.co.dto.LecturaDto;
 import com.mas.co.dto.PagoDto;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,6 +13,23 @@ import org.springframework.data.domain.Pageable;
  * @version 1.0
  */
 public interface LecturaService {
+
+    /**
+     * Obtiene facturas por año paginadas.
+     *
+     * @param anio año de consulta
+     * @param pageable información de paginación
+     * @return página de facturas del año
+     */
+    Page<LecturaDto> obtenerFacturasPorAnio(Integer anio, Pageable pageable);
+
+    /**
+     * Obtiene facturas vencidas paginadas.
+     *
+     * @param pageable información de paginación
+     * @return página de facturas vencidas
+     */
+    Page<LecturaDto> obtenerFacturasVencidas(Pageable pageable);
 
     /**
      * Obtiene todas las facturas paginadas ordenadas por creación.
@@ -44,6 +62,15 @@ public interface LecturaService {
      * @return última lectura del usuario
      */
     LecturaDto obtenerUltimaLectura(Long usuarioId);
+
+    /**
+     * Obtiene la última factura de cada usuario (una por usuario_id).
+     * Se usa para precargar el histórico reciente en el cliente móvil y habilitar
+     * validaciones de negocio (período consecutivo) en modo offline.
+     *
+     * @return lista con la última factura de cada usuario
+     */
+    List<LecturaDto> obtenerUltimasLecturas();
 
     /**
      * Obtiene facturas por usuario paginadas.

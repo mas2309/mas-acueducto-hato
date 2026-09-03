@@ -47,7 +47,8 @@ public class LecturaAction extends BaseAction {
 
     // Filtros
     private String q;
-    private String filtro; // todas, pendientes, pagadas
+    private String filtro;
+    private int anioFiltro = java.time.LocalDate.now().getYear();
 
     // Pago
     private String metodoPago;
@@ -60,12 +61,12 @@ public class LecturaAction extends BaseAction {
             resultado = lecturaService.buscarFacturas(q, pageable);
         } else if ("pendientes".equals(filtro)) {
             resultado = lecturaService.obtenerFacturasPendientes(pageable);
+        } else if ("vencidas".equals(filtro)) {
+            resultado = lecturaService.obtenerFacturasVencidas(pageable);
         } else if ("pagadas".equals(filtro)) {
             resultado = lecturaService.obtenerFacturasPagadas(pageable);
-        } else if ("vencidas".equals(filtro)) {
-            resultado = lecturaService.obtenerFacturasPendientes(pageable);
         } else {
-            resultado = lecturaService.obtenerTodasFacturas(pageable);
+            resultado = lecturaService.obtenerFacturasPorAnio(anioFiltro, pageable);
         }
 
         facturas = resultado.getContent();
@@ -217,6 +218,15 @@ public class LecturaAction extends BaseAction {
     @StrutsParameter
     public void setFiltro(String filtro) {
         this.filtro = filtro;
+    }
+
+    public int getAnioFiltro() {
+        return anioFiltro;
+    }
+
+    @StrutsParameter
+    public void setAnioFiltro(int anioFiltro) {
+        this.anioFiltro = anioFiltro;
     }
 
     public String getMetodoPago() {
