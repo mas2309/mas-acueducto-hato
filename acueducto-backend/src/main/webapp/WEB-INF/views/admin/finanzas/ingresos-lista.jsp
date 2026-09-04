@@ -50,6 +50,7 @@
                     <th>Descripci&oacute;n</th>
                     <th>Categor&iacute;a</th>
                     <th>Monto</th>
+                    <th>Soporte</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -62,6 +63,17 @@
                             <td><s:property value="#i.descripcion"/></td>
                             <td><span class="badge bg-success"><s:property value="#i.categoria"/></span></td>
                             <td><strong>$<s:property value="#i.monto"/></strong></td>
+                            <td>
+                                <s:if test="#i.soporteUrl != null && #i.soporteUrl != ''">
+                                    <a href="<s:property value='#i.soporteUrl' escapeHtml='false'/>" target="_blank"
+                                       class="btn-action btn-action-view" title="<s:property value='#i.soporteNombre'/>">
+                                        <i class="bi bi-file-earmark-arrow-down"></i>
+                                    </a>
+                                </s:if>
+                                <s:else>
+                                    <span class="text-muted" style="font-size:.75rem;">&mdash;</span>
+                                </s:else>
+                            </td>
                             <td>
                                 <div class="d-flex gap-1">
                                     <a href="<s:url namespace='/admin' action='ingreso-formulario'><s:param name='id' value='#i.id'/></s:url>"
@@ -79,7 +91,7 @@
                     </s:iterator>
                 </s:if>
                 <s:else>
-                    <tr><td colspan="6"><div class="empty-state"><i class="bi bi-inbox"></i><p>No hay ingresos registrados</p></div></td></tr>
+                    <tr><td colspan="7"><div class="empty-state"><i class="bi bi-inbox"></i><p>No hay ingresos registrados</p></div></td></tr>
                 </s:else>
             </tbody>
         </table>

@@ -68,8 +68,9 @@ dependencies {
     // Huawei Cloud CSMS SDK (DEW - Secret Management)
     implementation 'com.huaweicloud.sdk:huaweicloud-sdk-csms:3.1.72'
 
-    // Huawei Cloud OBS SDK
-    implementation 'com.huaweicloud:esdk-obs-java-bundle:3.24.3'
+    // AWS SDK v2 - S3-compatible Object Storage (Contabo, self-hosted en VPS)
+    implementation platform('software.amazon.awssdk:bom:2.28.11')
+    implementation 'software.amazon.awssdk:s3'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

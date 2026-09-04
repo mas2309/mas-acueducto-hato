@@ -33,7 +33,7 @@
             </h5>
         </div>
 
-        <s:form namespace="/admin" action="ingreso-guardar" method="post" theme="simple">
+        <s:form namespace="/admin" action="ingreso-guardar" method="post" enctype="multipart/form-data" theme="simple">
             <s:hidden name="ingreso.id" value="%{ingreso.id}"/>
 
             <div class="mb-3">
@@ -66,6 +66,21 @@
                 <s:select name="ingreso.categoria" id="categoria" cssClass="form-control"
                           list="categorias" listValue="name()"
                           value="%{ingreso.categoria}" required="true"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="soporteFile" class="form-label">Soporte (imagen o PDF)</label>
+                <input type="file" name="soporteFile" id="soporteFile" class="form-control"
+                       accept=".pdf,.jpg,.jpeg,.png">
+                <div class="form-text">Formatos: PDF, JPG, PNG. M&aacute;ximo 10MB.</div>
+                <s:if test="ingreso.soporteNombre != null && ingreso.soporteNombre != ''">
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-paperclip me-1"></i>
+                            Archivo actual: <a href="<s:property value='ingreso.soporteUrl'/>" target="_blank"><s:property value="ingreso.soporteNombre"/></a>
+                        </span>
+                    </div>
+                </s:if>
             </div>
 
             <hr class="my-4">

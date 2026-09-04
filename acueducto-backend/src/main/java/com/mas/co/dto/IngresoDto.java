@@ -31,6 +31,8 @@ public class IngresoDto {
     @NotNull(message = "La categoría es obligatoria")
     private CategoriaIngreso categoria;
 
+    private String soporteUrl;
+    private String soporteNombre;
     private Long facturaId;
     private LocalDate fechaRegistro;
 }
