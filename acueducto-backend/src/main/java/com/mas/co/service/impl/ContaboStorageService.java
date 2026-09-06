@@ -60,6 +60,9 @@ public class ContaboStorageService implements StorageService {
                             + "STORAGE_ENDPOINT, STORAGE_TENANT_ID, STORAGE_BUCKET, "
                             + "CONTABO_ACCESS_KEY y CONTABO_SECRET_KEY (ninguna puede estar vacía).");
         }
+        log.info("Inicializando ContaboStorageService: endpoint={}, tenantId={}, bucket={}, "
+                        + "URL base resultante={}",
+                endpoint, tenantId, bucket, endpoint + "/" + tenantId + ":" + bucket);
         client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of("us-east-1"))
