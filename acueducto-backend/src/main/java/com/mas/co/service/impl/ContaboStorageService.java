@@ -51,6 +51,12 @@ public class ContaboStorageService implements StorageService {
 
     @PostConstruct
     void init() {
+        if (accessKey == null || accessKey.isBlank() || secretKey == null || secretKey.isBlank()
+                || tenantId == null || tenantId.isBlank()) {
+            throw new IllegalStateException(
+                    "Configuración de storage incompleta: revisa las variables de entorno "
+                            + "STORAGE_TENANT_ID, CONTABO_ACCESS_KEY y CONTABO_SECRET_KEY.");
+        }
         client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of("us-east-1"))
