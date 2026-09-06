@@ -19,6 +19,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
@@ -51,11 +52,13 @@ public class ContaboStorageService implements StorageService {
 
     @PostConstruct
     void init() {
-        if (accessKey == null || accessKey.isBlank() || secretKey == null || secretKey.isBlank()
-                || tenantId == null || tenantId.isBlank()) {
+        if (endpoint == null || endpoint.isBlank() || accessKey == null || accessKey.isBlank()
+                || secretKey == null || secretKey.isBlank() || tenantId == null || tenantId.isBlank()
+                || bucket == null || bucket.isBlank()) {
             throw new IllegalStateException(
                     "Configuración de storage incompleta: revisa las variables de entorno "
-                            + "STORAGE_TENANT_ID, CONTABO_ACCESS_KEY y CONTABO_SECRET_KEY.");
+                            + "STORAGE_ENDPOINT, STORAGE_TENANT_ID, STORAGE_BUCKET, "
+                            + "CONTABO_ACCESS_KEY y CONTABO_SECRET_KEY (ninguna puede estar vacía).");
         }
         client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
@@ -77,6 +80,7 @@ public class ContaboStorageService implements StorageService {
                             .bucket(bucket)
                             .key(key)
                             .contentType(file.getContentType())
+                            .acl(ObjectCannedACL.PUBLIC_READ)
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             String url = buildUrl(key);
@@ -92,7 +96,11 @@ public class ContaboStorageService implements StorageService {
     public String uploadFile(File file, String objectKey) {
         try {
             client.putObject(
-                    PutObjectRequest.builder().bucket(bucket).key(objectKey).build(),
+                    PutObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(objectKey)
+                            .acl(ObjectCannedACL.PUBLIC_READ)
+                            .build(),
                     RequestBody.fromFile(file));
             String url = buildUrl(objectKey);
             log.info("Archivo subido a Contabo: {}", url);
