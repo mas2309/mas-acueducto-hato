@@ -52,7 +52,7 @@
             </p>
         </div>
 
-        <s:form namespace="/admin" action="cuota-guardar" method="post">
+        <s:form namespace="/admin" action="cuota-guardar" method="post" theme="simple">
             <s:hidden name="cuota.id" value="%{cuota.id}"/>
 
             <%-- Usuario --%>

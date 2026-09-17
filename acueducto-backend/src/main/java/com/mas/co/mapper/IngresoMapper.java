@@ -20,6 +20,8 @@ public class IngresoMapper {
                 .monto(ingreso.getMonto())
                 .fecha(ingreso.getFecha())
                 .categoria(ingreso.getCategoria())
+                .soporteUrl(ingreso.getSoporteUrl())
+                .soporteNombre(ingreso.getSoporteNombre())
                 .facturaId(ingreso.getFactura() != null ? ingreso.getFactura().getId() : null)
                 .fechaRegistro(ingreso.getFechaRegistro())
                 .build();

@@ -53,6 +53,12 @@ public class Ingreso {
     @Column(name = "categoria", nullable = false, length = 30)
     private CategoriaIngreso categoria;
 
+    @Column(name = "soporte_url", length = 500)
+    private String soporteUrl;
+
+    @Column(name = "soporte_nombre", length = 200)
+    private String soporteNombre;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "factura_id")
     private Factura factura;

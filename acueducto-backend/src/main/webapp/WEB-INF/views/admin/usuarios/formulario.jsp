@@ -52,7 +52,7 @@
             </p>
         </div>
 
-        <s:form namespace="/admin" action="usuario-guardar" method="post">
+        <s:form namespace="/admin" action="usuario-guardar" method="post" theme="simple">
             <s:hidden name="usuario.id" value="%{usuario.id}"/>
 
             <div class="mb-3">

@@ -104,6 +104,12 @@ jobs:
               -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              -e JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
+              -e STORAGE_ENDPOINT="${{ secrets.STORAGE_ENDPOINT }}" \
+              -e STORAGE_TENANT_ID="${{ secrets.STORAGE_TENANT_ID }}" \
+              -e STORAGE_BUCKET="${{ secrets.STORAGE_BUCKET }}" \
+              -e CONTABO_ACCESS_KEY="${{ secrets.CONTABO_ACCESS_KEY }}" \
+              -e CONTABO_SECRET_KEY="${{ secrets.CONTABO_SECRET_KEY }}" \
               $IMAGE
           ENDSSH
 

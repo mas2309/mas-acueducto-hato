@@ -33,7 +33,7 @@
             </h5>
         </div>
 
-        <s:form namespace="/admin" action="gasto-guardar" method="post" enctype="multipart/form-data">
+        <s:form namespace="/admin" action="gasto-guardar" method="post" enctype="multipart/form-data" theme="simple">
             <s:hidden name="gasto.id" value="%{gasto.id}"/>
 
             <div class="mb-3">

@@ -51,3 +51,11 @@ security:
     secret-key: ${JWT_SECRET_KEY:dGhpcyBpcyBhIHNlY3VyZSBrZXkgZm9yIGFjdWVkdWN0byBiYWNrZW5kIGFwaSBtYXMgZGV2ZWxvcG1lbnQ=}
     access-token-expiration: 3600000
     refresh-token-expiration: 604800000
+
+# Almacenamiento de archivos (Contabo Object Storage, S3-compatible, en la VPS)
+storage:
+  endpoint: ${STORAGE_ENDPOINT:https://usc1.contabostorage.com}
+  tenant-id: ${STORAGE_TENANT_ID:}
+  access-key: ${CONTABO_ACCESS_KEY:}
+  secret-key: ${CONTABO_SECRET_KEY:}
+  bucket: ${STORAGE_BUCKET:acueducto-hato}

@@ -6,14 +6,15 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IngresoService {
 
-    IngresoDto crear(IngresoDto dto);
+    IngresoDto crear(IngresoDto dto, MultipartFile soporte);
 
     IngresoDto obtener(Long id);
 
-    IngresoDto actualizar(Long id, IngresoDto dto);
+    IngresoDto actualizar(Long id, IngresoDto dto, MultipartFile soporte);
 
     void eliminar(Long id);
 
