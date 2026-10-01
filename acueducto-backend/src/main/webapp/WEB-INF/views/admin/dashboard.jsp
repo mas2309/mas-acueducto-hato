@@ -5,6 +5,22 @@
 <script>document.getElementById('pageTitle').textContent = 'Dashboard';</script>
 <script>document.getElementById('nav-dashboard').classList.add('active');</script>
 
+<%-- Flash messages --%>
+<s:if test="mensajeExito != null && mensajeExito != ''">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-1"></i>
+        <s:property value="mensajeExito"/>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</s:if>
+<s:if test="mensajeError != null && mensajeError != ''">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-1"></i>
+        <s:property value="mensajeError"/>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</s:if>
+
 <%-- Banner de bienvenida con logo --%>
 <div class="card mb-4 fade-in-item" style="background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); border:none;">
     <div class="card-body p-4">

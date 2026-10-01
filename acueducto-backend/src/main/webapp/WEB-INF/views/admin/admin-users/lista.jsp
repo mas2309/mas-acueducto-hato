@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <jsp:include page="/WEB-INF/views/layout/header.jsp"/>
 
 <script>
@@ -27,9 +28,11 @@
 <div class="table-container fade-in-item">
     <div class="table-header">
         <h5><i class="bi bi-shield-lock me-2"></i>Usuarios del Sistema</h5>
+        <sec:authorize access="hasRole('ESCRITURA')">
         <a href="<s:url namespace='/admin' action='admin-user-formulario'/>" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg me-1"></i> Nuevo Usuario
         </a>
+        </sec:authorize>
     </div>
 
     <div class="table-responsive">
@@ -54,14 +57,11 @@
                             <td><s:property value="#u.nombreCompleto"/></td>
                             <td><s:property value="#u.email"/></td>
                             <td>
-                                <s:if test="#u.role.name() == 'ADMIN'">
-                                    <span class="badge bg-primary">Admin</span>
+                                <s:if test="#u.role.name() == 'ESCRITURA'">
+                                    <span class="badge bg-primary">Escritura</span>
                                 </s:if>
-                                <s:elseif test="#u.role.name() == 'OPERADOR'">
-                                    <span class="badge bg-success">Operador</span>
-                                </s:elseif>
                                 <s:else>
-                                    <span class="badge bg-secondary">Consulta</span>
+                                    <span class="badge bg-secondary">Lectura</span>
                                 </s:else>
                             </td>
                             <td>
@@ -73,6 +73,7 @@
                                 </s:else>
                             </td>
                             <td>
+                                <sec:authorize access="hasRole('ESCRITURA')">
                                 <div class="d-flex gap-1">
                                     <a href="<s:url namespace='/admin' action='admin-user-formulario'><s:param name='id' value='#u.id'/></s:url>"
                                        class="btn-action btn-action-edit" title="Editar">
@@ -84,6 +85,7 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
+                                </sec:authorize>
                             </td>
                         </tr>
                     </s:iterator>

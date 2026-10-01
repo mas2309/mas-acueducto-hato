@@ -49,7 +49,7 @@ public class AdminUser implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
     @Builder.Default
-    private Role role = Role.OPERADOR;
+    private Role role = Role.LECTURA;
 
     @Column(name = "activo", nullable = false)
     @Builder.Default

@@ -58,7 +58,7 @@
                 <i class="bi bi-bar-chart-line"></i> Informes
             </a>
 
-            <sec:authorize access="hasRole('ADMIN')">
+            <sec:authorize access="hasAnyRole('ESCRITURA', 'LECTURA')">
             <div class="sidebar-section">Seguridad</div>
             <a href="<s:url namespace='/admin' action='admin-users'/>" class="sidebar-link" id="nav-admin-users">
                 <i class="bi bi-shield-lock"></i> Usuarios Admin
