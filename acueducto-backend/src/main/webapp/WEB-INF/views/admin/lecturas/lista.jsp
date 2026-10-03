@@ -231,7 +231,7 @@
                             </li>
                         </s:else>
 
-                        <s:iterator begin="%{[page - 2] > 0 ? page - 2 : 0}" end="%{[page + 2] < totalPages - 1 ? page + 2 : totalPages - 1}" var="i">
+                        <s:iterator begin="%{(page - 2) > 0 ? page - 2 : 0}" end="%{(page + 2) < (totalPages - 1) ? page + 2 : totalPages - 1}" var="i">
                             <s:if test="#i == page">
                                 <li class="page-item active">
                                     <span class="page-link"><s:property value="#i + 1"/></span>

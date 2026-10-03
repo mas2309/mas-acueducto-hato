@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,14 +33,17 @@ public class SecurityConfig {
     private final WebLoginFailureHandler webLoginFailureHandler;
     private final WebLoginSuccessHandler webLoginSuccessHandler;
     private final LoginRateLimitFilter loginRateLimitFilter;
+    private final WebAccessDeniedHandler webAccessDeniedHandler;
 
     public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
                           CustomUserDetailsService userDetailsService,
                           WebLoginFailureHandler webLoginFailureHandler,
                           WebLoginSuccessHandler webLoginSuccessHandler,
-                          LoginRateLimitFilter loginRateLimitFilter) {
+                          LoginRateLimitFilter loginRateLimitFilter,
+                          WebAccessDeniedHandler webAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.webAccessDeniedHandler = webAccessDeniedHandler;
         this.webLoginFailureHandler = webLoginFailureHandler;
         this.webLoginSuccessHandler = webLoginSuccessHandler;
         this.loginRateLimitFilter = loginRateLimitFilter;
@@ -59,14 +63,18 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
-                .requestMatchers("/api/v1/auth/register").hasRole("ADMIN")
-                .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "OPERADOR")
-                .requestMatchers("/api/v1/lecturas/**").hasAnyRole("ADMIN", "OPERADOR")
-                .requestMatchers("/api/v1/cuotas/**").hasAnyRole("ADMIN", "OPERADOR")
-                .requestMatchers("/api/v1/values/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/ingresos/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/gastos/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/reports/**").hasAnyRole("ADMIN", "CONSULTA")
+                .requestMatchers("/api/v1/auth/register").hasRole("ESCRITURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/users/**").hasRole("ESCRITURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/lecturas/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/lecturas/**").hasRole("ESCRITURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/cuotas/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/cuotas/**").hasRole("ESCRITURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/values/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/values/**").hasRole("ESCRITURA")
+                .requestMatchers("/api/v1/ingresos/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/gastos/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers("/api/v1/reports/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
@@ -87,8 +95,21 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/static/**").permitAll()
-                .requestMatchers("/admin/admin-user*").hasRole("ADMIN")
-                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "OPERADOR")
+                // Gestion de cuentas administrativas: exclusiva de ESCRITURA (lectura incluida).
+                .requestMatchers("/admin/admin-user-guardar*", "/admin/admin-user-eliminar*").hasRole("ESCRITURA")
+                // Ingresos y Gastos: LECTURA conserva escritura aqui, por excepcion de negocio.
+                .requestMatchers(
+                    "/admin/ingreso-guardar*", "/admin/ingreso-eliminar*",
+                    "/admin/gasto-guardar*", "/admin/gasto-eliminar*", "/admin/gasto-pagar*"
+                ).hasAnyRole("ESCRITURA", "LECTURA")
+                // Resto de acciones de escritura del panel: solo ESCRITURA.
+                .requestMatchers(
+                    "/admin/usuario-guardar*", "/admin/usuario-eliminar*", "/admin/usuario-desactivar*",
+                    "/admin/cuota-guardar*", "/admin/cuota-eliminar*", "/admin/cuota-desactivar*", "/admin/cuota-pago*",
+                    "/admin/lectura-ingresar*", "/admin/factura-pagar*", "/admin/factura-eliminar*"
+                ).hasRole("ESCRITURA")
+                // Resto del panel (listados, formularios de vista, detalle, exportaciones): lectura para ambos roles.
+                .requestMatchers("/admin/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -105,7 +126,8 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
-            );
+            )
+            .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(webAccessDeniedHandler));
 
         return http.build();
     }

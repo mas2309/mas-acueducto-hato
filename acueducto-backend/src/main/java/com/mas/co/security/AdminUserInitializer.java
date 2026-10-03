@@ -22,7 +22,7 @@ public class AdminUserInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("Admin123*"))
                     .nombreCompleto("Administrador Sistema")
                     .email("admin@acueducto.com")
-                    .role(Role.ADMIN)
+                    .role(Role.ESCRITURA)
                     .build();
 
             adminUserRepository.save(admin);

@@ -21,6 +21,10 @@ public class InformeDto {
     private double totalNoPago;
     private double totalDeudaAnterior;
 
+    // Deuda pendiente real a la fecha (sin duplicar arrastre entre meses): suma, por usuario,
+    // el valorTotal de su última factura si esta sigue impaga.
+    private double totalDeudaPendienteReal;
+
     // Discriminación por método de pago
     private double ingresoEfectivo;
     private double ingresoBanco;

@@ -106,9 +106,8 @@
                           value="%{adminUser.role}"
                           required="true"/>
                 <div class="form-text">
-                    <strong>ADMIN:</strong> Acceso total &bull;
-                    <strong>OPERADOR:</strong> Gesti&oacute;n de usuarios y facturas &bull;
-                    <strong>CONSULTA:</strong> Solo lectura
+                    <strong>ESCRITURA:</strong> Acceso total, incluida la gesti&oacute;n de usuarios administrativos &bull;
+                    <strong>LECTURA:</strong> Solo lectura en el sistema (excepto Ingresos y Gastos, donde tambi&eacute;n puede escribir)
                 </div>
             </div>
 

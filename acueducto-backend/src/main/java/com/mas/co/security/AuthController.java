@@ -38,8 +38,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Registrar usuario", description = "Crea un nuevo usuario administrativo (solo ADMIN)")
+    @PreAuthorize("hasRole('ESCRITURA')")
+    @Operation(summary = "Registrar usuario", description = "Crea un nuevo usuario administrativo (solo ESCRITURA)")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)

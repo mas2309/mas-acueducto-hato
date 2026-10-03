@@ -47,7 +47,21 @@ public class InformeService {
         InformeDto.InformeDtoBuilder builder = InformeDto.builder();
         calcularTotales(facturas, builder);
         calcularDatosMensuales(facturas, builder);
+        builder.totalDeudaPendienteReal(calcularDeudaPendienteReal());
         return builder.build();
+    }
+
+    /**
+     * Calcula la deuda pendiente real a la fecha, a nivel de todo el sistema (no solo del
+     * período filtrado): toma la última factura de cada usuario y, si sigue impaga, suma su
+     * valorTotal. Evita el doble conteo de {@code totalDeudaAnterior}, que al ser un componente
+     * de cada factura individual se arrastra y se re-factura mes a mes mientras la deuda persiste.
+     */
+    private double calcularDeudaPendienteReal() {
+        return facturaRepository.findUltimasFacturasPorUsuario().stream()
+                .filter(f -> !f.isPagada())
+                .mapToDouble(f -> val(f.getValorTotal()))
+                .sum();
     }
 
     private void calcularTotales(List<Factura> facturas, InformeDto.InformeDtoBuilder builder) {
