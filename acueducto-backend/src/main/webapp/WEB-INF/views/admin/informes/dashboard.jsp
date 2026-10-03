@@ -81,6 +81,13 @@
             <div class="stat-label">Facturas Vencidas</div>
         </div>
     </div>
+    <div class="col-sm-6 col-xl-3 fade-in-item">
+        <div class="stat-card stat-card-red">
+            <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-value money-format" style="font-size:1.5rem;"><s:property value="informe.totalDeudaPendienteReal"/></div>
+            <div class="stat-label">Deuda Pendiente Real (a la fecha)</div>
+        </div>
+    </div>
 </div>
 
 <%-- Método de Pago + Discriminación Ingresos --%>

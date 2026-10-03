@@ -98,6 +98,8 @@ public class InformeExcelService {
         crearFilaSimple(sheet, row++, "Facturas Pendientes", String.valueOf(inf.getFacturasPendientes()));
         crearFilaSimple(sheet, row++, "Facturas Vencidas", String.valueOf(inf.getFacturasVencidas()));
         crearFilaSimple(sheet, row++, "Consumo Total (m³)", String.valueOf(inf.getTotalMetrosCubicos()));
+        crearFilaSimple(sheet, row++, "Deuda Pendiente Real (a la fecha)",
+                String.format("$%,.0f", inf.getTotalDeudaPendienteReal()));
 
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);
