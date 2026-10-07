@@ -16,6 +16,7 @@ services:
       - CONTABO_SECRET_KEY=${CONTABO_SECRET_KEY}
       - NEW_RELIC_AGENT_ENABLED=${NEW_RELIC_AGENT_ENABLED:-false}
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
+      - NEW_RELIC_JFR_ENABLED=${NEW_RELIC_JFR_ENABLED:-true}
       - NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-acueducto-backend-local}
     networks:
       - mas-network

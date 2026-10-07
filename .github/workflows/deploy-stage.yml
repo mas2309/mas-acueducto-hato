@@ -112,6 +112,7 @@ jobs:
               -e CONTABO_SECRET_KEY="${{ secrets.CONTABO_SECRET_KEY }}" \
               -e NEW_RELIC_AGENT_ENABLED="${{ vars.NEW_RELIC_ENABLED || 'false' }}" \
               -e NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}" \
+              -e NEW_RELIC_JFR_ENABLED="${{ vars.NEW_RELIC_JFR_ENABLED || 'true' }}" \
               -e NEW_RELIC_APP_NAME="acueducto-backend-stage" \
               $IMAGE
           ENDSSH
