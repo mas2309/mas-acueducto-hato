@@ -1,5 +1,6 @@
 package com.mas.co.exception;
 
+import com.newrelic.api.agent.NewRelic;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,7 +153,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
         log.error("Unexpected exception occurred: {}", ex.getMessage(), ex);
-        
+        // La excepción queda manejada aquí, así que se reporta explícitamente para conservar el stack trace en APM
+        NewRelic.noticeError(ex);
+
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

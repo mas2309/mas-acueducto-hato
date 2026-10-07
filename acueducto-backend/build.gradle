@@ -88,6 +88,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
+    // Observabilidad (API del agente New Relic; sin agente es no-op)
+    implementation 'com.newrelic.agent.java:newrelic-api:9.5.0'
+
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
