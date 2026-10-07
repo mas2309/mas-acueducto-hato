@@ -110,6 +110,9 @@ jobs:
               -e STORAGE_BUCKET="${{ secrets.STORAGE_BUCKET }}" \
               -e CONTABO_ACCESS_KEY="${{ secrets.CONTABO_ACCESS_KEY }}" \
               -e CONTABO_SECRET_KEY="${{ secrets.CONTABO_SECRET_KEY }}" \
+              -e NEW_RELIC_AGENT_ENABLED="${{ vars.NEW_RELIC_ENABLED || 'false' }}" \
+              -e NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}" \
+              -e NEW_RELIC_APP_NAME="acueducto-backend-stage" \
               $IMAGE
           ENDSSH
 
