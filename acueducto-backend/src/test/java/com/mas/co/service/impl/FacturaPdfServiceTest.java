@@ -9,6 +9,7 @@ import com.mas.co.entity.Factura;
 import com.mas.co.entity.FacturaCuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.NotaInformativaService;
 import com.mas.co.service.impl.FacturaPdfService.Concepto;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class FacturaPdfServiceTest {
 
   @Mock private FacturaRepository facturaRepository;
+
+  @Mock private NotaInformativaService notaInformativaService;
 
   @InjectMocks private FacturaPdfService facturaPdfService;
 
@@ -123,6 +126,8 @@ class FacturaPdfServiceTest {
     factura.agregarCuota(cuota("Obras tanque", 1, 2, 50000.0));
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(facturaRepository.findUltimaLecturaPorUsuario(1L)).thenReturn(List.of());
+    when(notaInformativaService.obtenerTextoVigente())
+        .thenReturn("El 15 de marzo se suspende el servicio por mantenimiento del tanque.");
 
     byte[] pdf = facturaPdfService.generarPdf(1L);
 

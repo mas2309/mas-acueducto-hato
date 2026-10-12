@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/ingresos/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .requestMatchers("/api/v1/gastos/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .requestMatchers("/api/v1/reports/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/receipt-note/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
@@ -110,7 +111,7 @@ public class SecurityConfig {
                     "/admin/cobro-global-pago-anticipado*", "/admin/cobro-global-revertir-anticipado*",
                     "/admin/cobro-global-agregar-usuario*",
                     // Tarifas: tambien la consulta es exclusiva de ESCRITURA.
-                    "/admin/tarifas*",
+                    "/admin/tarifas*", "/admin/nota-recibo*",
                     "/admin/lectura-ingresar*", "/admin/factura-pagar*", "/admin/factura-eliminar*"
                 ).hasRole("ESCRITURA")
                 // Resto del panel (listados, formularios de vista, detalle, exportaciones): lectura para ambos roles.

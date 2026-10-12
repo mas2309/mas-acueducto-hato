@@ -4,6 +4,7 @@ import com.mas.co.entity.Factura;
 import com.mas.co.entity.FacturaCuota;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.NotaInformativaService;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,6 +35,7 @@ public class FacturaPdfService {
     private static final int MAX_CONCEPTOS = 8;
 
     private final FacturaRepository facturaRepository;
+    private final NotaInformativaService notaInformativaService;
 
 
     public byte[] generarPdf(Long facturaId) {
@@ -73,6 +75,7 @@ public class FacturaPdfService {
         params.put("consumo_anterior", obtenerConsumoAnterior(factura));
         params.put("mes", factura.getMes());
         params.put("ruta_imagen", rutaImagen);
+        params.put("nota", notaInformativaService.obtenerTextoVigente());
 
         // El reporte tiene un número fijo de filas: las que no se usan van vacías
         List<Concepto> conceptos = buildConceptos(factura);

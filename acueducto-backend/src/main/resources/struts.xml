@@ -164,6 +164,18 @@
             <result name="input">/WEB-INF/views/admin/tarifas/formulario.jsp</result>
         </action>
 
+        <!-- Nota informativa de los recibos -->
+        <action name="nota-recibo" class="notaInformativaAction" method="formulario">
+            <result>/WEB-INF/views/admin/nota-recibo/formulario.jsp</result>
+        </action>
+
+        <action name="nota-recibo-guardar" class="notaInformativaAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">nota-recibo</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/nota-recibo/formulario.jsp</result>
+        </action>
+
         <!-- Lecturas / Facturas -->
         <action name="facturas" class="lecturaAction" method="listar">
             <result>/WEB-INF/views/admin/lecturas/lista.jsp</result>

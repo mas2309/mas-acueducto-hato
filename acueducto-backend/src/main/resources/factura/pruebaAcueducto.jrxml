@@ -12,6 +12,7 @@
 	<parameter name="conceptos" class="java.util.List"/>
 	<parameter name="valores" class="java.util.List"/>
 	<parameter name="total" class="java.lang.String"/>
+	<parameter name="nota" class="java.lang.String"/>
 	<parameter name="ruta_imagen" class="java.lang.String"/>
 	<parameter name="mes" class="java.lang.String"/>
 	<query language="sql"><![CDATA[]]></query>
@@ -372,11 +373,17 @@
 		<element kind="textField" uuid="5654e82b-a5df-4d4e-b8ec-dd9df97a075a" x="222" y="227" width="68" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<expression><![CDATA["$ " + $P{total}]]></expression>
 		</element>
-		<element kind="staticText" uuid="0a13a7ea-85ae-4b74-a3b8-ee0be14da907" x="10" y="239" width="280" height="51" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+		<element kind="staticText" uuid="0a13a7ea-85ae-4b74-a3b8-ee0be14da907" x="10" y="239" width="280" height="30" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede Duitama o
 corresponsales bancarios a nivel nacional. Recuerde reportar su pago al número
 3005641323 vía whatsapp
 ]]></text>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000101" x="10" y="270" width="280" height="28" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nota}]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000102" x="293" y="270" width="250" height="28" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nota}]]></expression>
 		</element>
 		<element kind="staticText" uuid="fc5f2551-8af4-4aa7-8682-fb9192a2e068" x="10" y="299" width="281" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[USUARIO]]></text>
@@ -387,7 +394,7 @@ corresponsales bancarios a nivel nacional. Recuerde reportar su pago al número
 		<element kind="textField" uuid="e8b77230-5ac5-41c8-aa63-40a9eeb6887f" x="482" y="227" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<expression><![CDATA["$ " + $P{total}]]></expression>
 		</element>
-		<element kind="staticText" uuid="094590c0-4736-4eaa-a053-7c1cd6394cc9" x="293" y="239" width="250" height="51" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+		<element kind="staticText" uuid="094590c0-4736-4eaa-a053-7c1cd6394cc9" x="293" y="239" width="250" height="30" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede
 Duitama o corresponsales bancarios a nivel nacional. Recuerde
 reportar su pago al número 3005641323 vía whatsapp]]></text>

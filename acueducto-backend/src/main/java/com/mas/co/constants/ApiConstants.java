@@ -23,6 +23,7 @@ public final class ApiConstants {
     public static final String REPORTS_PATH = API_BASE_PATH + "/reports";
     public static final String INGRESOS_PATH = API_BASE_PATH + "/ingresos";
     public static final String GASTOS_PATH = API_BASE_PATH + "/gastos";
+    public static final String RECEIPT_NOTE_PATH = API_BASE_PATH + "/receipt-note";
 
     // HTTP Headers
     public static final String AUTHORIZATION_HEADER = "Authorization";

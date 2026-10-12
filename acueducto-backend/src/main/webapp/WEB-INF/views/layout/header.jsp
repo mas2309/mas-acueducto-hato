@@ -51,6 +51,9 @@
             <a href="<s:url namespace='/admin' action='tarifas'/>" class="sidebar-link" id="nav-tarifas">
                 <i class="bi bi-sliders"></i> Tarifas
             </a>
+            <a href="<s:url namespace='/admin' action='nota-recibo'/>" class="sidebar-link" id="nav-nota-recibo">
+                <i class="bi bi-megaphone"></i> Nota en Recibos
+            </a>
             </sec:authorize>
 
             <div class="sidebar-section">Finanzas</div>
