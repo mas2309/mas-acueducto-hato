@@ -17,6 +17,10 @@ RUN wget -q "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/${
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+
+# Fuentes para generar el PDF de la factura (JasperReports): la imagen alpine no trae ninguna
+RUN apk add --no-cache fontconfig ttf-dejavu
+
 RUN addgroup -S appuser && adduser -S appuser -G appuser
 COPY --from=build /app/build/libs/*.war app.war
 COPY --from=newrelic /tmp/newrelic/newrelic.jar /tmp/newrelic/newrelic.yml newrelic/
