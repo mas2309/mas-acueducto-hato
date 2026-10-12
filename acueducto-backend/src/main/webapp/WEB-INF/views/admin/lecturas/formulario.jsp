@@ -127,7 +127,7 @@
             <%-- Info --%>
             <div class="alert alert-info border-0 py-2 px-3" style="font-size:.8rem; background:#eff6ff;">
                 <i class="bi bi-info-circle me-1"></i>
-                El sistema calcular&aacute; autom&aacute;ticamente: lectura anterior, consumo, valor consumo, deuda anterior, cuota activa, cargo fijo y valor total.
+                El sistema calcular&aacute; autom&aacute;ticamente: lectura anterior, consumo, valor consumo, deuda anterior, cuotas activas, cargo fijo y valor total.
             </div>
 
             <hr class="my-4">

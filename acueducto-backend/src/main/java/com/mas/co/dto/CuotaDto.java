@@ -69,4 +69,10 @@ public class CuotaDto {
 
     @Schema(description = "Nombre completo del usuario", example = "Juan Carlos García López")
     private String usuarioNombre;
+
+    @Schema(description = "ID del cobro global que generó la cuota", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    private Long cobroGlobalId;
+
+    @Schema(description = "Indica si las cuotas restantes se pagaron por anticipado", example = "false", accessMode = Schema.AccessMode.READ_ONLY)
+    private Boolean pagoAnticipado;
 }

@@ -2,6 +2,7 @@ package com.mas.co.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -9,10 +10,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mas.co.dto.CuotaDto;
 import com.mas.co.dto.LecturaDto;
 import com.mas.co.dto.PagoDto;
 import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.FacturaCuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.mapper.LecturaMapper;
@@ -26,6 +29,7 @@ import com.mas.co.usecase.ObtenerLecturaAnteriorUseCase;
 import com.mas.co.usecase.ValidarPeriodoConsecutivoUseCase;
 import jakarta.persistence.EntityManager;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -105,8 +109,8 @@ class LecturaServiceImplTest {
     when(facturaRepository.existsByUsuarioIdAndMesAndAnio(1L, "Enero", 2024)).thenReturn(false);
     when(obtenerLecturaAnteriorUseCase.execute(1L)).thenReturn(50);
     when(obtenerDeudaAnteriorUseCase.execute(1L)).thenReturn(0.0);
-    when(cuotaRepository.findFirstByUsuarioIdAndActivoTrueOrderByFechaInsertDesc(1L))
-        .thenReturn(Optional.empty());
+    when(cuotaRepository.findByUsuarioIdAndActivoTrueOrderByIdAsc(1L))
+        .thenReturn(Collections.emptyList());
     doNothing().when(calcularValoresFacturaUseCase).execute(any());
     when(lecturaMapper.toEntity(any())).thenReturn(factura);
     when(facturaRepository.save(any())).thenReturn(factura);
@@ -126,8 +130,9 @@ class LecturaServiceImplTest {
     when(facturaRepository.existsByUsuarioIdAndMesAndAnio(1L, "Enero", 2024)).thenReturn(false);
     when(obtenerLecturaAnteriorUseCase.execute(1L)).thenReturn(50);
     when(obtenerDeudaAnteriorUseCase.execute(1L)).thenReturn(0.0);
-    when(cuotaRepository.findFirstByUsuarioIdAndActivoTrueOrderByFechaInsertDesc(1L))
-        .thenReturn(Optional.of(cuota));
+    when(cuotaRepository.findByUsuarioIdAndActivoTrueOrderByIdAsc(1L))
+        .thenReturn(Collections.singletonList(cuota));
+    when(cuotaService.procesarPagoCuota(1L)).thenReturn(cuotaCobrada("Financiación", 6, 12, 25000.0));
     doNothing().when(calcularValoresFacturaUseCase).execute(any());
     when(lecturaMapper.toEntity(any())).thenReturn(factura);
     when(facturaRepository.save(any())).thenReturn(factura);
@@ -137,6 +142,48 @@ class LecturaServiceImplTest {
 
     assertNotNull(result);
     verify(cuotaService).procesarPagoCuota(1L);
+  }
+
+  @Test
+  @DisplayName("Ingresar lectura - Cobra todas las cuotas activas del usuario")
+  void ingresarLectura_ConVariasCuotas_CobraTodas() {
+    Cuota cuotaGlobal = new Cuota();
+    cuotaGlobal.setId(2L);
+
+    when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuario));
+    doNothing().when(validarPeriodoConsecutivoUseCase).execute(any());
+    when(facturaRepository.existsByUsuarioIdAndMesAndAnio(1L, "Enero", 2024)).thenReturn(false);
+    when(obtenerLecturaAnteriorUseCase.execute(1L)).thenReturn(50);
+    when(obtenerDeudaAnteriorUseCase.execute(1L)).thenReturn(0.0);
+    when(cuotaRepository.findByUsuarioIdAndActivoTrueOrderByIdAsc(1L))
+        .thenReturn(List.of(cuota, cuotaGlobal));
+    when(cuotaService.procesarPagoCuota(1L)).thenReturn(cuotaCobrada("Financiación", 6, 12, 25000.0));
+    when(cuotaService.procesarPagoCuota(2L)).thenReturn(cuotaCobrada("Obras tanque", 1, 2, 50000.0));
+    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    when(lecturaMapper.toEntity(any())).thenReturn(factura);
+    when(facturaRepository.save(any())).thenReturn(factura);
+    when(lecturaMapper.toDto(any())).thenReturn(lecturaDto);
+
+    lecturaService.ingresarLectura(lecturaDto);
+
+    assertEquals(75000.0, lecturaDto.getValorCuota());
+    assertEquals(2, factura.getCuotas().size());
+    FacturaCuota cuotaFacturada = factura.getCuotas().get(1);
+    assertSame(cuotaGlobal, cuotaFacturada.getCuota());
+    assertSame(factura, cuotaFacturada.getFactura());
+    assertEquals("Obras tanque", cuotaFacturada.getDescripcion());
+    assertEquals(1, cuotaFacturada.getNumeroCuota());
+    assertEquals(2, cuotaFacturada.getTotalCuotas());
+    assertEquals(50000.0, cuotaFacturada.getValor());
+  }
+
+  private CuotaDto cuotaCobrada(String descripcion, int cuotaActual, int numeroCuota, double valorCuota) {
+    return CuotaDto.builder()
+        .descripcion(descripcion)
+        .cuotaActual(cuotaActual)
+        .numeroCuota(numeroCuota)
+        .valorCuota(valorCuota)
+        .build();
   }
 
   @Test

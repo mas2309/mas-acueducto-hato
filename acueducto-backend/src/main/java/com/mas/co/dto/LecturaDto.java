@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DTO para ingreso de lectura de consumo.
@@ -74,10 +75,16 @@ public class LecturaDto {
     @PositiveOrZero(message = "La deuda anterior debe ser positiva")
     private Double deudaAnterior;
 
-    @Schema(description = "ID de cuota asociada", example = "1")
+    @Schema(description = "ID de la primera cuota asociada. Se conserva por compatibilidad, usar cuotas", example = "1")
     private Long cuotaId;
 
-    @Schema(description = "Valor de cuota", example = "25000.0")
+    @Schema(description = "IDs de las cuotas que debe tener la factura al actualizarla. Si no se envía se usa cuotaId")
+    private List<Long> cuotaIds;
+
+    @Schema(description = "Detalle de las cuotas cobradas en la factura", accessMode = Schema.AccessMode.READ_ONLY)
+    private List<CuotaFacturaDto> cuotas;
+
+    @Schema(description = "Valor total de las cuotas cobradas", example = "25000.0")
     private Double valorCuota;
 
     @Schema(description = "Cargo fijo del servicio", example = "15000.0")

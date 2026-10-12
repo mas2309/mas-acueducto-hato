@@ -106,6 +106,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/admin/usuario-guardar*", "/admin/usuario-eliminar*", "/admin/usuario-desactivar*",
                     "/admin/cuota-guardar*", "/admin/cuota-eliminar*", "/admin/cuota-desactivar*", "/admin/cuota-pago*",
+                    "/admin/cobro-global-guardar*", "/admin/cobro-global-eliminar*", "/admin/cobro-global-cancelar*",
+                    "/admin/cobro-global-pago-anticipado*", "/admin/cobro-global-revertir-anticipado*",
+                    "/admin/cobro-global-agregar-usuario*",
                     "/admin/lectura-ingresar*", "/admin/factura-pagar*", "/admin/factura-eliminar*"
                 ).hasRole("ESCRITURA")
                 // Resto del panel (listados, formularios de vista, detalle, exportaciones): lectura para ambos roles.

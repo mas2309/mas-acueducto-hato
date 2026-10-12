@@ -26,13 +26,22 @@ public interface CuotaRepository extends JpaRepository<Cuota, Long> {
     Optional<Cuota> findByIdAndActivoTrue(Long id);
 
     /**
-     * Obtiene la primera cuota activa de un usuario, ordenada por fecha de inserción descendente.
-     * Ideal para encontrar la cuota más reciente que aún está activa.
-     *
-     * @param usuarioId ID del usuario.
-     * @return Un {@link Optional} que contiene la cuota si se encuentra, o vacío si no.
+     * Obtiene todas las cuotas activas de un usuario en el orden en que se crearon.
+     * Son las cuotas que se cobran en la siguiente factura del usuario.
      */
-    Optional<Cuota> findFirstByUsuarioIdAndActivoTrueOrderByFechaInsertDesc(Long usuarioId);
+    List<Cuota> findByUsuarioIdAndActivoTrueOrderByIdAsc(Long usuarioId);
+
+    /**
+     * Obtiene las cuotas generadas por un cobro global, con su usuario, ordenadas por nombre.
+     */
+    @Query("SELECT c FROM Cuota c JOIN FETCH c.usuario u WHERE c.cobroGlobal.id = :cobroGlobalId " +
+           "ORDER BY u.nombre, u.apellidos")
+    List<Cuota> findByCobroGlobalId(@Param("cobroGlobalId") Long cobroGlobalId);
+
+    /**
+     * Verifica si un usuario ya tiene cuota en un cobro global.
+     */
+    boolean existsByCobroGlobalIdAndUsuarioId(Long cobroGlobalId, Long usuarioId);
 
     /**
      * Obtiene todas las cuotas activas paginadas.

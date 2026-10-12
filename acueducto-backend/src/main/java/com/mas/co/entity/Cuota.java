@@ -21,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 /**
  * Entidad Cuota del sistema de acueducto.
@@ -77,6 +78,17 @@ public class Cuota {
   @NotNull(message = "El usuario es obligatorio")
   private Usuario usuario;
 
+  /** Cobro global que generó la cuota. Nulo en cuotas individuales. */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "cobro_global_id")
+  private CobroGlobal cobroGlobal;
+
+  /** Indica que el usuario pagó por fuera de la factura las cuotas que faltaban. */
+  @Column(name = "pago_anticipado", nullable = false)
+  @ColumnDefault("false")
+  @Builder.Default
+  private Boolean pagoAnticipado = false;
+
   @PrePersist
   protected void onCreate() {
     if (fechaInsert == null) {
@@ -84,6 +96,9 @@ public class Cuota {
     }
     if (activo == null) {
       activo = BusinessConstants.QUOTA_ACTIVE;
+    }
+    if (pagoAnticipado == null) {
+      pagoAnticipado = false;
     }
   }
 
@@ -94,5 +109,15 @@ public class Cuota {
    */
   public boolean isActiva() {
     return Boolean.TRUE.equals(activo);
+  }
+
+  /**
+   * Calcula el valor de las cuotas que aún no se han cobrado.
+   *
+   * @return valor pendiente por cobrar
+   */
+  public double getValorRestante() {
+    int restantes = Math.max(numeroCuota - cuotaActual, 0);
+    return restantes * valorCuota;
   }
 }

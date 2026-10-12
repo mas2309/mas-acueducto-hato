@@ -1,6 +1,7 @@
 package com.mas.co.service.impl;
 
 import com.mas.co.dto.CuotaDto;
+import com.mas.co.entity.CobroGlobal;
 import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.exception.BusinessException;
@@ -120,6 +121,49 @@ public class CuotaServiceImpl implements CuotaService {
         log.info("Pago de cuota procesado exitosamente: {} (cuota {}/{})", 
                 id, cuota.getCuotaActual(), cuota.getNumeroCuota());
         
+        return cuotaMapper.toDto(cuotaActualizada);
+    }
+
+    @Override
+    @Transactional
+    public CuotaDto registrarPagoAnticipado(Long id) {
+        log.debug("Registrando pago anticipado de cuota con ID: {}", id);
+
+        Cuota cuota = cuotaRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> BusinessException.quotaNotFound(id));
+
+        cuota.setPagoAnticipado(true);
+        cuota.setActivo(false);
+        Cuota cuotaActualizada = cuotaRepository.save(cuota);
+
+        log.info("Pago anticipado registrado para cuota: {} (cuota {}/{})",
+                id, cuota.getCuotaActual(), cuota.getNumeroCuota());
+        return cuotaMapper.toDto(cuotaActualizada);
+    }
+
+    @Override
+    @Transactional
+    public CuotaDto revertirPagoAnticipado(Long id) {
+        log.debug("Revirtiendo pago anticipado de cuota con ID: {}", id);
+
+        Cuota cuota = cuotaRepository.findById(id)
+                .orElseThrow(() -> BusinessException.quotaNotFound(id));
+
+        if (!Boolean.TRUE.equals(cuota.getPagoAnticipado())) {
+            throw BusinessException.quotaNotPrepaid(id);
+        }
+
+        // Si el cobro global fue cancelado la cuota no debe volver a facturarse
+        CobroGlobal cobroGlobal = cuota.getCobroGlobal();
+        if (cobroGlobal != null && !Boolean.TRUE.equals(cobroGlobal.getActivo())) {
+            throw BusinessException.globalChargeNotActive(cobroGlobal.getId());
+        }
+
+        cuota.setPagoAnticipado(false);
+        cuota.setActivo(true);
+        Cuota cuotaActualizada = cuotaRepository.save(cuota);
+
+        log.info("Pago anticipado revertido para cuota: {}", id);
         return cuotaMapper.toDto(cuotaActualizada);
     }
 

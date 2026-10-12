@@ -41,6 +41,9 @@
             <a href="<s:url namespace='/admin' action='cuotas'/>" class="sidebar-link" id="nav-cuotas">
                 <i class="bi bi-credit-card"></i> Cuotas
             </a>
+            <a href="<s:url namespace='/admin' action='cobros-globales'/>" class="sidebar-link" id="nav-cobros-globales">
+                <i class="bi bi-collection"></i> Cobros Globales
+            </a>
             <a href="<s:url namespace='/admin' action='facturas'/>" class="sidebar-link" id="nav-facturas">
                 <i class="bi bi-receipt"></i> Facturas
             </a>

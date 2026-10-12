@@ -82,6 +82,64 @@
             </result>
         </action>
 
+        <!-- Cobros Globales -->
+        <action name="cobros-globales" class="cobroGlobalAction" method="listar">
+            <result>/WEB-INF/views/admin/cobros-globales/lista.jsp</result>
+        </action>
+
+        <action name="cobro-global-formulario" class="cobroGlobalAction" method="formulario">
+            <result>/WEB-INF/views/admin/cobros-globales/formulario.jsp</result>
+        </action>
+
+        <action name="cobro-global-guardar" class="cobroGlobalAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">cobro-global-detalle</param>
+                <param name="id">${id}</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/cobros-globales/formulario.jsp</result>
+        </action>
+
+        <action name="cobro-global-detalle" class="cobroGlobalAction" method="detalle">
+            <result>/WEB-INF/views/admin/cobros-globales/detalle.jsp</result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">cobros-globales</param>
+            </result>
+        </action>
+
+        <action name="cobro-global-pago-anticipado" class="cobroGlobalAction" method="pagoAnticipado">
+            <result type="redirectAction">
+                <param name="actionName">cobro-global-detalle</param>
+                <param name="id">${id}</param>
+            </result>
+        </action>
+
+        <action name="cobro-global-revertir-anticipado" class="cobroGlobalAction" method="revertirPagoAnticipado">
+            <result type="redirectAction">
+                <param name="actionName">cobro-global-detalle</param>
+                <param name="id">${id}</param>
+            </result>
+        </action>
+
+        <action name="cobro-global-agregar-usuario" class="cobroGlobalAction" method="agregarUsuario">
+            <result type="redirectAction">
+                <param name="actionName">cobro-global-detalle</param>
+                <param name="id">${id}</param>
+            </result>
+        </action>
+
+        <action name="cobro-global-cancelar" class="cobroGlobalAction" method="cancelar">
+            <result type="redirectAction">
+                <param name="actionName">cobro-global-detalle</param>
+                <param name="id">${id}</param>
+            </result>
+        </action>
+
+        <action name="cobro-global-eliminar" class="cobroGlobalAction" method="eliminar">
+            <result type="redirectAction">
+                <param name="actionName">cobros-globales</param>
+            </result>
+        </action>
+
         <!-- Lecturas / Facturas -->
         <action name="facturas" class="lecturaAction" method="listar">
             <result>/WEB-INF/views/admin/lecturas/lista.jsp</result>

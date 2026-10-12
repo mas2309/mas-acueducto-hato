@@ -2,7 +2,9 @@ package com.mas.co.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,9 +13,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mas.co.dto.CuotaDto;
 import com.mas.co.dto.LecturaDto;
 import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.FacturaCuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.mapper.LecturaMapper;
@@ -21,6 +25,7 @@ import com.mas.co.repository.CuotaRepository;
 import com.mas.co.repository.FacturaRepository;
 import com.mas.co.service.CuotaService;
 import com.mas.co.usecase.CalcularValoresFacturaUseCase;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +51,7 @@ class LecturaServiceImplUpdateDeleteTest {
   private Usuario usuario;
   private LecturaDto lecturaDto;
   private Cuota cuota;
+  private CuotaDto cuotaCobrada;
 
   @BeforeEach
   void setUp() {
@@ -81,6 +87,14 @@ class LecturaServiceImplUpdateDeleteTest {
     cuota.setId(1L);
     cuota.setCuotaActual(5);
     cuota.setActivo(true);
+
+    cuotaCobrada =
+        CuotaDto.builder()
+            .descripcion("Cuota test")
+            .cuotaActual(6)
+            .numeroCuota(12)
+            .valorCuota(25000.0)
+            .build();
   }
 
   @Test
@@ -151,6 +165,7 @@ class LecturaServiceImplUpdateDeleteTest {
     lecturaDto.setValorCuota(25000.0);
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(cuotaRepository.findById(1L)).thenReturn(Optional.of(cuota));
+    when(cuotaService.procesarPagoCuota(1L)).thenReturn(cuotaCobrada);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
     doNothing().when(calcularValoresFacturaUseCase).execute(any());
@@ -160,6 +175,56 @@ class LecturaServiceImplUpdateDeleteTest {
     assertNotNull(result);
     verify(cuotaRepository).findById(1L);
     verify(cuotaService).procesarPagoCuota(1L);
+    assertEquals(1, factura.getCuotas().size());
+    assertEquals(25000.0, lecturaDto.getValorCuota());
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - Reenviar la primera cuota conserva las demás")
+  void actualizarFactura_ReenviaPrimeraCuota_ConservaTodas() {
+    Cuota cuotaGlobal = new Cuota();
+    cuotaGlobal.setId(2L);
+    cuotaGlobal.setCuotaActual(1);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
+    factura.agregarCuota(facturaCuota(cuotaGlobal, 50000.0));
+
+    lecturaDto.setCuotaId(1L);
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(2, factura.getCuotas().size());
+    assertEquals(75000.0, lecturaDto.getValorCuota());
+    verify(cuotaRepository, never()).save(any());
+    verify(cuotaService, never()).procesarPagoCuota(any());
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - cuotaIds define las cuotas de la factura")
+  void actualizarFactura_ConCuotaIds_QuitaLasNoEnviadas() {
+    Cuota cuotaGlobal = new Cuota();
+    cuotaGlobal.setId(2L);
+    cuotaGlobal.setCuotaActual(1);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
+    factura.agregarCuota(facturaCuota(cuotaGlobal, 50000.0));
+
+    lecturaDto.setCuotaIds(List.of(2L));
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuota);
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(1, factura.getCuotas().size());
+    assertSame(cuotaGlobal, factura.getCuotas().get(0).getCuota());
+    assertEquals(50000.0, lecturaDto.getValorCuota());
+    assertEquals(4, cuota.getCuotaActual());
+    assertEquals(1, cuotaGlobal.getCuotaActual());
   }
 
   @Test
@@ -168,12 +233,13 @@ class LecturaServiceImplUpdateDeleteTest {
     Cuota cuotaAnterior = new Cuota();
     cuotaAnterior.setId(2L);
     cuotaAnterior.setCuotaActual(3);
-    factura.setCuota(cuotaAnterior);
+    factura.agregarCuota(facturaCuota(cuotaAnterior, 10000.0));
 
     lecturaDto.setCuotaId(1L);
     lecturaDto.setValorCuota(25000.0);
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(cuotaRepository.findById(1L)).thenReturn(Optional.of(cuota));
+    when(cuotaService.procesarPagoCuota(1L)).thenReturn(cuotaCobrada);
     when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuotaAnterior);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
@@ -184,12 +250,14 @@ class LecturaServiceImplUpdateDeleteTest {
     assertNotNull(result);
     verify(cuotaRepository).save(cuotaAnterior);
     assertEquals(2, cuotaAnterior.getCuotaActual());
+    assertEquals(1, factura.getCuotas().size());
+    assertSame(cuota, factura.getCuotas().get(0).getCuota());
   }
 
   @Test
   @DisplayName("Actualizar factura - Quitar cuota")
   void actualizarFactura_QuitarCuota_Success() {
-    factura.setCuota(cuota);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
     lecturaDto.setCuotaId(null);
 
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
@@ -203,6 +271,8 @@ class LecturaServiceImplUpdateDeleteTest {
     assertNotNull(result);
     verify(cuotaRepository).save(cuota);
     assertEquals(4, cuota.getCuotaActual());
+    assertTrue(factura.getCuotas().isEmpty());
+    assertEquals(0.0, lecturaDto.getValorCuota());
   }
 
   @Test
@@ -249,7 +319,7 @@ class LecturaServiceImplUpdateDeleteTest {
   @Test
   @DisplayName("Eliminar factura con cuota - Revierte cuota")
   void eliminarFactura_ConCuota_RevierteCuota() {
-    factura.setCuota(cuota);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuota);
     doNothing().when(facturaRepository).deleteById(1L);
@@ -278,7 +348,7 @@ class LecturaServiceImplUpdateDeleteTest {
   @DisplayName("Eliminar factura - Cuota con cuotaActual en 0 no se revierte")
   void eliminarFactura_CuotaEnCero_NoRevierte() {
     cuota.setCuotaActual(0);
-    factura.setCuota(cuota);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     doNothing().when(facturaRepository).deleteById(1L);
 
@@ -286,5 +356,31 @@ class LecturaServiceImplUpdateDeleteTest {
 
     verify(cuotaRepository, never()).save(any());
     verify(facturaRepository).deleteById(1L);
+  }
+
+  @Test
+  @DisplayName("Eliminar factura - Cuota con pago anticipado no se reactiva")
+  void eliminarFactura_CuotaConPagoAnticipado_NoReactiva() {
+    cuota.setActivo(false);
+    cuota.setPagoAnticipado(true);
+    factura.agregarCuota(facturaCuota(cuota, 25000.0));
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuota);
+    doNothing().when(facturaRepository).deleteById(1L);
+
+    lecturaService.eliminarFactura(1L);
+
+    assertEquals(4, cuota.getCuotaActual());
+    assertFalse(cuota.getActivo());
+  }
+
+  private FacturaCuota facturaCuota(Cuota cuotaFacturada, double valor) {
+    return FacturaCuota.builder()
+        .cuota(cuotaFacturada)
+        .descripcion("Cuota test")
+        .numeroCuota(cuotaFacturada.getCuotaActual())
+        .totalCuotas(12)
+        .valor(valor)
+        .build();
   }
 }
