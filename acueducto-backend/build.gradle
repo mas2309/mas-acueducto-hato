@@ -55,6 +55,9 @@ dependencies {
     // JasperReports para generación de facturas PDF
     implementation 'net.sf.jasperreports:jasperreports:7.0.0'
     implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.0'
+    // Compila la plantilla en memoria. Sin esto Jasper escribe un .java en disco y necesita javac,
+    // que no existe en la imagen JRE del contenedor.
+    implementation 'net.sf.jasperreports:jasperreports-jdt:7.0.0'
 
     // Apache POI para exportación Excel
     implementation 'org.apache.poi:poi:5.2.5'

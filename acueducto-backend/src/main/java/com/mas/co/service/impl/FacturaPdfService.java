@@ -5,6 +5,7 @@ import com.mas.co.entity.FacturaCuota;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.repository.FacturaRepository;
 import com.mas.co.service.NotaInformativaService;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +17,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -37,6 +39,8 @@ public class FacturaPdfService {
     private final FacturaRepository facturaRepository;
     private final NotaInformativaService notaInformativaService;
 
+    private JasperReport reporteCompilado;
+
 
     public byte[] generarPdf(Long facturaId) {
         log.debug("Generando PDF para factura ID: {}", facturaId);
@@ -45,8 +49,7 @@ public class FacturaPdfService {
                 .orElseThrow(() -> BusinessException.invoiceNotFound(facturaId));
 
         try {
-            InputStream jrxmlStream = getClass().getResourceAsStream(JRXML_PATH);
-            JasperReport report = JasperCompileManager.compileReport(jrxmlStream);
+            JasperReport report = obtenerReporte();
 
             Map<String, Object> parameters = buildParameters(factura);
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
@@ -58,6 +61,16 @@ public class FacturaPdfService {
             log.error("Error generando PDF para factura ID: {}", facturaId, e);
             throw new RuntimeException("Error al generar la factura PDF: " + e.getMessage(), e);
         }
+    }
+
+    /** Compila la plantilla una sola vez: compilarla en cada descarga tarda cerca de un segundo. */
+    private synchronized JasperReport obtenerReporte() throws JRException, IOException {
+        if (reporteCompilado == null) {
+            try (InputStream jrxmlStream = getClass().getResourceAsStream(JRXML_PATH)) {
+                reporteCompilado = JasperCompileManager.compileReport(jrxmlStream);
+            }
+        }
+        return reporteCompilado;
     }
 
     private Map<String, Object> buildParameters(Factura factura) {
