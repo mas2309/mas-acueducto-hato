@@ -237,6 +237,68 @@
 </div>
 </s:if>
 
+<%-- Consumo por rango de tarifa (del período filtrado) --%>
+<s:if test="informe.totalFacturas > 0">
+<div class="card fade-in-item mt-4">
+    <div class="card-body p-4">
+        <h6 class="fw-semibold mb-1">
+            <i class="bi bi-bar-chart-steps me-2 text-primary"></i>Consumo por Rango
+        </h6>
+        <p class="text-muted mb-3" style="font-size:.8rem;">
+            Facturas del per&iacute;odo seg&uacute;n el rango en que cae su consumo, con los l&iacute;mites de las tarifas vigentes.
+            El valor es lo facturado por consumo, sin cargo fijo ni otros cobros.
+        </p>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="font-size:.7rem;">RANGO</th>
+                        <th style="font-size:.7rem;">CONSUMO</th>
+                        <th class="text-end" style="font-size:.7rem;">VALOR m&sup3;</th>
+                        <th class="text-center" style="font-size:.7rem;">USUARIOS</th>
+                        <th style="font-size:.7rem;min-width:160px;">FACTURAS</th>
+                        <th class="text-center" style="font-size:.7rem;">m&sup3;</th>
+                        <th style="font-size:.7rem;min-width:200px;">VALOR CONSUMO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <s:iterator value="informe.rangosConsumo">
+                        <tr>
+                            <td class="fw-semibold"><s:property value="nombre"/></td>
+                            <td><s:property value="descripcion"/></td>
+                            <td class="text-end">
+                                <s:if test="valorMetroCubico != null"><span class="money-format"><s:property value="valorMetroCubico"/></span></s:if>
+                                <s:else><span class="text-muted">-</span></s:else>
+                            </td>
+                            <td class="text-center"><s:property value="usuarios"/></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-nowrap" style="min-width:36px;"><s:property value="facturas"/></span>
+                                    <div class="progress flex-grow-1" style="height:6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: <s:property value='porcentajeFacturas'/>%"></div>
+                                    </div>
+                                    <small class="text-muted text-nowrap"><s:property value="porcentajeFacturas"/>%</small>
+                                </div>
+                            </td>
+                            <td class="text-center"><s:property value="consumoM3"/></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-semibold text-nowrap money-format" style="min-width:80px;"><s:property value="valorConsumo"/></span>
+                                    <div class="progress flex-grow-1" style="height:6px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: <s:property value='porcentajeValor'/>%"></div>
+                                    </div>
+                                    <small class="text-muted text-nowrap"><s:property value="porcentajeValor"/>%</small>
+                                </div>
+                            </td>
+                        </tr>
+                    </s:iterator>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</s:if>
+
 <%-- Usuarios con mayor deuda (a la fecha, no depende del filtro) --%>
 <div class="card fade-in-item mt-4">
     <div class="card-body p-4">

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -13,9 +14,12 @@ import static org.mockito.Mockito.when;
 
 import com.mas.co.dto.InformeDto;
 import com.mas.co.dto.InformeDto.DeudorDto;
+import com.mas.co.dto.InformeDto.RangoConsumoDto;
 import com.mas.co.entity.Factura;
 import com.mas.co.entity.Usuario;
+import com.mas.co.entity.Valores;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.ValorService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +39,8 @@ class InformeServiceTest {
 
   @Mock private EstadoFacturaService estadoFacturaService;
 
+  @Mock private ValorService valorService;
+
   @InjectMocks private InformeService informeService;
 
   private Usuario ana;
@@ -49,7 +55,86 @@ class InformeServiceTest {
     carla = Usuario.builder().id(3L).nombre("Carla").apellidos("Mora").build();
     dario = Usuario.builder().id(4L).nombre("Darío").apellidos("Peña").build();
 
+    Valores valores = new Valores();
+    valores.setRangoUno(10.0);
+    valores.setRangoDos(20.0);
+    valores.setRangoTres(30.0);
+    valores.setValorUno(600);
+    valores.setValorDos(1000);
+    valores.setValorTres(1500);
+    valores.setValorCuatro(3500);
+    when(valorService.obtenerValores()).thenReturn(valores);
+
     when(facturaRepository.findByAnio(2026)).thenReturn(List.of());
+  }
+
+  @Test
+  @DisplayName("Debe agrupar las facturas del período por rango de consumo")
+  void debeAgruparFacturasPorRangoDeConsumo() {
+    facturasPagadasEnEfectivo();
+    when(facturaRepository.findByAnio(2026))
+        .thenReturn(
+            List.of(
+                consumo(ana, "Enero", 5, 3000.0),
+                consumo(ana, "Febrero", 10, 6000.0),
+                consumo(beto, "Enero", 11, 7000.0),
+                consumo(carla, "Enero", 30, 31000.0),
+                consumo(dario, "Enero", 40, 66000.0),
+                consumo(dario, "Febrero", 0, 0.0)));
+    when(facturaRepository.findUltimasFacturasPorUsuario()).thenReturn(List.of());
+
+    List<RangoConsumoDto> rangos = informeService.generarInformeAnual(2026).getRangosConsumo();
+
+    assertEquals(
+        List.of("Sin consumo", "Rango 1", "Rango 2", "Rango 3", "Rango 4"),
+        rangos.stream().map(RangoConsumoDto::getNombre).toList());
+    assertEquals(
+        List.of("0 m³", "1 a 10 m³", "11 a 20 m³", "21 a 30 m³", "Más de 30 m³"),
+        rangos.stream().map(RangoConsumoDto::getDescripcion).toList());
+
+    RangoConsumoDto rangoUno = rangos.get(1);
+    assertEquals(600, rangoUno.getValorMetroCubico());
+    assertEquals(1, rangoUno.getUsuarios());
+    assertEquals(2, rangoUno.getFacturas());
+    assertEquals(15, rangoUno.getConsumoM3());
+    assertEquals(9000.0, rangoUno.getValorConsumo());
+    assertEquals(33, rangoUno.getPorcentajeFacturas());
+    assertEquals(8, rangoUno.getPorcentajeValor());
+
+    assertEquals(List.of(1, 2, 1, 1, 1), rangos.stream().map(RangoConsumoDto::getFacturas).toList());
+    assertEquals(66000.0, rangos.get(4).getValorConsumo());
+    assertEquals(58, rangos.get(4).getPorcentajeValor());
+  }
+
+  @Test
+  @DisplayName("No debe mostrar el rango sin consumo si no hay facturas en cero")
+  void noDebeMostrarSinConsumoSiNoHayFacturasEnCero() {
+    facturasPagadasEnEfectivo();
+    when(facturaRepository.findByAnio(2026)).thenReturn(List.of(consumo(ana, "Enero", 5, 3000.0)));
+    when(facturaRepository.findUltimasFacturasPorUsuario()).thenReturn(List.of());
+
+    List<RangoConsumoDto> rangos = informeService.generarInformeAnual(2026).getRangosConsumo();
+
+    assertEquals(
+        List.of("Rango 1", "Rango 2", "Rango 3", "Rango 4"),
+        rangos.stream().map(RangoConsumoDto::getNombre).toList());
+  }
+
+  private void facturasPagadasEnEfectivo() {
+    when(estadoFacturaService.calcularEstado(anyBoolean(), anyBoolean(), anyString(), anyInt()))
+        .thenReturn("EFECTIVO");
+  }
+
+  private Factura consumo(Usuario usuario, String mes, int consumo, double valorConsumo) {
+    return Factura.builder()
+        .usuario(usuario)
+        .mes(mes)
+        .anio(2026)
+        .consumo(consumo)
+        .valorConsumo(valorConsumo)
+        .valorTotal(valorConsumo)
+        .pago(true)
+        .build();
   }
 
   @Test

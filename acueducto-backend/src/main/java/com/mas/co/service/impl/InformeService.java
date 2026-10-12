@@ -4,10 +4,14 @@ import com.mas.co.constants.BusinessConstants;
 import com.mas.co.dto.InformeDto;
 import com.mas.co.dto.InformeDto.DeudorDto;
 import com.mas.co.dto.InformeDto.InformeMensualDto;
+import com.mas.co.dto.InformeDto.RangoConsumoDto;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.Valores;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.ValorService;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +35,7 @@ public class InformeService {
 
     private final FacturaRepository facturaRepository;
     private final EstadoFacturaService estadoFacturaService;
+    private final ValorService valorService;
 
     public List<Integer> obtenerAniosDisponibles() {
         return facturaRepository.findAniosDisponibles();
@@ -52,6 +57,7 @@ public class InformeService {
         InformeDto.InformeDtoBuilder builder = InformeDto.builder();
         calcularTotales(facturas, builder);
         calcularDatosMensuales(facturas, builder);
+        builder.rangosConsumo(calcularRangosConsumo(facturas));
         List<Factura> ultimasImpagas = facturaRepository.findUltimasFacturasPorUsuario().stream()
                 .filter(f -> !f.isPagada())
                 .toList();
@@ -128,6 +134,69 @@ public class InformeService {
                 .debeDesde(periodo(masAntigua))
                 .ultimoPago(ultimoPago)
                 .build());
+    }
+
+    /**
+     * Agrupa las facturas del período según el rango de tarifa en que cae su consumo. Los límites
+     * son los de las tarifas vigentes, también para facturas generadas con tarifas anteriores.
+     */
+    private List<RangoConsumoDto> calcularRangosConsumo(List<Factura> facturas) {
+        Valores valores = valorService.obtenerValores();
+        int limiteUno = valores.getRangoUno().intValue();
+        int limiteDos = valores.getRangoDos().intValue();
+        int limiteTres = valores.getRangoTres().intValue();
+
+        List<RangoConsumoDto> rangos = List.of(
+                rango("Sin consumo", "0 m³", null),
+                rango("Rango 1", "1 a " + limiteUno + " m³", valores.getValorUno()),
+                rango("Rango 2", (limiteUno + 1) + " a " + limiteDos + " m³", valores.getValorDos()),
+                rango("Rango 3", (limiteDos + 1) + " a " + limiteTres + " m³", valores.getValorTres()),
+                rango("Rango 4", "Más de " + limiteTres + " m³", valores.getValorCuatro()));
+        List<Set<Long>> usuariosPorRango = rangos.stream().map(r -> (Set<Long>) new HashSet<Long>()).toList();
+
+        double valorTotal = 0;
+        for (Factura f : facturas) {
+            int consumo = f.getConsumo() != null ? f.getConsumo() : 0;
+            int indice;
+            if (consumo <= 0) {
+                indice = 0;
+            } else if (consumo <= limiteUno) {
+                indice = 1;
+            } else if (consumo <= limiteDos) {
+                indice = 2;
+            } else if (consumo <= limiteTres) {
+                indice = 3;
+            } else {
+                indice = 4;
+            }
+
+            RangoConsumoDto rango = rangos.get(indice);
+            rango.setFacturas(rango.getFacturas() + 1);
+            rango.setConsumoM3(rango.getConsumoM3() + consumo);
+            rango.setValorConsumo(rango.getValorConsumo() + val(f.getValorConsumo()));
+            usuariosPorRango.get(indice).add(f.getUsuario().getId());
+            valorTotal += val(f.getValorConsumo());
+        }
+
+        for (int i = 0; i < rangos.size(); i++) {
+            RangoConsumoDto rango = rangos.get(i);
+            rango.setUsuarios(usuariosPorRango.get(i).size());
+            rango.setPorcentajeFacturas(porcentaje(rango.getFacturas(), facturas.size()));
+            rango.setPorcentajeValor(porcentaje(rango.getValorConsumo(), valorTotal));
+        }
+
+        // "Sin consumo" solo se muestra si hay facturas en cero
+        return rangos.stream().filter(r -> r.getValorMetroCubico() != null || r.getFacturas() > 0).toList();
+    }
+
+    private RangoConsumoDto rango(String nombre, String descripcion, Integer valorMetroCubico) {
+        return RangoConsumoDto.builder()
+                .nombre(nombre).descripcion(descripcion).valorMetroCubico(valorMetroCubico)
+                .build();
+    }
+
+    private int porcentaje(double parte, double total) {
+        return total > 0 ? (int) Math.round(parte * 100 / total) : 0;
     }
 
     private int ordenPeriodo(Factura f) {

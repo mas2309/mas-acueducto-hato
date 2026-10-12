@@ -3,6 +3,7 @@ package com.mas.co.service.impl;
 import com.mas.co.dto.InformeDto;
 import com.mas.co.dto.InformeDto.DeudorDto;
 import com.mas.co.dto.InformeDto.InformeMensualDto;
+import com.mas.co.dto.InformeDto.RangoConsumoDto;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,13 @@ public class InformeExcelService {
             Sheet pagos = wb.createSheet("Método de Pago");
             escribirMetodoPago(pagos, informe, headerStyle, moneyStyle, titleStyle);
 
-            // Hoja 4: Deudores
+            // Hoja: Consumo por Rango
+            if (informe.getRangosConsumo() != null && !informe.getRangosConsumo().isEmpty()) {
+                Sheet rangos = wb.createSheet("Consumo por Rango");
+                escribirRangosConsumo(rangos, informe, headerStyle, moneyStyle);
+            }
+
+            // Hoja: Deudores
             if (informe.getDeudores() != null && !informe.getDeudores().isEmpty()) {
                 Sheet deudores = wb.createSheet("Deudores");
                 escribirDeudores(deudores, informe, headerStyle, moneyStyle);
@@ -52,6 +59,37 @@ public class InformeExcelService {
 
             wb.write(out);
             return out.toByteArray();
+        }
+    }
+
+    private void escribirRangosConsumo(Sheet sheet, InformeDto inf, CellStyle headerStyle, CellStyle moneyStyle) {
+        int row = 0;
+        Row h = sheet.createRow(row++);
+        String[] headers = {"Rango", "Consumo", "Valor m³ ($)", "Usuarios", "Facturas",
+                "% Facturas", "m³ consumidos", "Valor consumo ($)", "% Valor"};
+        for (int i = 0; i < headers.length; i++) {
+            h.createCell(i).setCellValue(headers[i]);
+            h.getCell(i).setCellStyle(headerStyle);
+        }
+
+        for (RangoConsumoDto rango : inf.getRangosConsumo()) {
+            Row r = sheet.createRow(row++);
+            r.createCell(0).setCellValue(rango.getNombre());
+            r.createCell(1).setCellValue(rango.getDescripcion());
+            if (rango.getValorMetroCubico() != null) {
+                r.createCell(2).setCellValue(rango.getValorMetroCubico());
+            }
+            r.createCell(3).setCellValue(rango.getUsuarios());
+            r.createCell(4).setCellValue(rango.getFacturas());
+            r.createCell(5).setCellValue(rango.getPorcentajeFacturas() + "%");
+            r.createCell(6).setCellValue(rango.getConsumoM3());
+            r.createCell(7).setCellValue(rango.getValorConsumo());
+            r.getCell(7).setCellStyle(moneyStyle);
+            r.createCell(8).setCellValue(rango.getPorcentajeValor() + "%");
+        }
+
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
         }
     }
 
