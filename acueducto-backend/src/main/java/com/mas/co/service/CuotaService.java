@@ -87,6 +87,13 @@ public interface CuotaService {
     List<CuotaDto> obtenerCuotasActivas();
 
     /**
+     * Cuenta las cuotas activas.
+     *
+     * @return número de cuotas activas
+     */
+    long contarCuotasActivas();
+
+    /**
      * Obtiene cuotas activas por usuario.
      * 
      * @param usuarioId ID del usuario

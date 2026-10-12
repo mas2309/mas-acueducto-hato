@@ -152,7 +152,9 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/actuator/health",
-                    "/actuator/info"
+                    "/actuator/info",
+                    // Precompilación de JSP al arrancar: se protege con un token propio de cada arranque
+                    "/internal/jsp-warmup"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

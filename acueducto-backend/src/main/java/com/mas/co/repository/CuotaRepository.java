@@ -44,6 +44,11 @@ public interface CuotaRepository extends JpaRepository<Cuota, Long> {
     boolean existsByCobroGlobalIdAndUsuarioId(Long cobroGlobalId, Long usuarioId);
 
     /**
+     * Cuenta las cuotas activas.
+     */
+    long countByActivoTrue();
+
+    /**
      * Obtiene todas las cuotas activas paginadas.
      */
     Page<Cuota> findByActivoTrue(Pageable pageable);

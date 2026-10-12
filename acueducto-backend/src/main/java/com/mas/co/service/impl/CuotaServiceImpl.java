@@ -234,6 +234,11 @@ public class CuotaServiceImpl implements CuotaService {
     }
 
     @Override
+    public long contarCuotasActivas() {
+        return cuotaRepository.countByActivoTrue();
+    }
+
+    @Override
     public List<CuotaDto> obtenerCuotasActivasPorUsuario(Long usuarioId) {
         log.debug("Obteniendo cuotas activas del usuario: {}", usuarioId);
         

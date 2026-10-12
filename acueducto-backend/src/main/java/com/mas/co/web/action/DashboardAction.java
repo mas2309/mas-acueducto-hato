@@ -42,7 +42,7 @@ public class DashboardAction extends BaseAction {
     @Override
     public String execute() {
         totalUsuarios = usuarioService.obtenerUsuariosActivos().size();
-        totalCuotasActivas = cuotaService.obtenerCuotasActivas().size();
+        totalCuotasActivas = cuotaService.contarCuotasActivas();
 
         LocalDate hoy = LocalDate.now();
         anioActual = hoy.getYear();
