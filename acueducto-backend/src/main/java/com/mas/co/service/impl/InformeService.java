@@ -1,12 +1,17 @@
 package com.mas.co.service.impl;
 
+import com.mas.co.constants.BusinessConstants;
 import com.mas.co.dto.InformeDto;
+import com.mas.co.dto.InformeDto.DeudorDto;
 import com.mas.co.dto.InformeDto.InformeMensualDto;
 import com.mas.co.entity.Factura;
 import com.mas.co.repository.FacturaRepository;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +52,11 @@ public class InformeService {
         InformeDto.InformeDtoBuilder builder = InformeDto.builder();
         calcularTotales(facturas, builder);
         calcularDatosMensuales(facturas, builder);
-        builder.totalDeudaPendienteReal(calcularDeudaPendienteReal());
+        List<Factura> ultimasImpagas = facturaRepository.findUltimasFacturasPorUsuario().stream()
+                .filter(f -> !f.isPagada())
+                .toList();
+        builder.totalDeudaPendienteReal(calcularDeudaPendienteReal(ultimasImpagas));
+        builder.deudores(calcularDeudores(ultimasImpagas));
         return builder.build();
     }
 
@@ -57,11 +66,76 @@ public class InformeService {
      * valorTotal. Evita el doble conteo de {@code totalDeudaAnterior}, que al ser un componente
      * de cada factura individual se arrastra y se re-factura mes a mes mientras la deuda persiste.
      */
-    private double calcularDeudaPendienteReal() {
-        return facturaRepository.findUltimasFacturasPorUsuario().stream()
-                .filter(f -> !f.isPagada())
+    private double calcularDeudaPendienteReal(List<Factura> ultimasImpagas) {
+        return ultimasImpagas.stream()
                 .mapToDouble(f -> val(f.getValorTotal()))
                 .sum();
+    }
+
+    /**
+     * Lista, del que más debe al que menos, los usuarios con facturas vencidas a la fecha (no
+     * solo del período filtrado). La deuda es el valorTotal de su última factura, que ya incluye
+     * lo arrastrado. Quien solo tiene pendiente una factura que aún está en plazo no aparece.
+     */
+    private List<DeudorDto> calcularDeudores(List<Factura> ultimasImpagas) {
+        if (ultimasImpagas.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> usuarioIds = ultimasImpagas.stream()
+                .map(f -> f.getUsuario().getId())
+                .collect(Collectors.toSet());
+
+        return facturaRepository.findByUsuarioIdIn(usuarioIds).stream()
+                .collect(Collectors.groupingBy(f -> f.getUsuario().getId()))
+                .values().stream()
+                .map(this::construirDeudor)
+                .flatMap(Optional::stream)
+                .sorted(Comparator.comparingDouble(DeudorDto::getDeuda)
+                        .thenComparingInt(DeudorDto::getFacturasSinPagar).reversed())
+                .toList();
+    }
+
+    private Optional<DeudorDto> construirDeudor(List<Factura> facturasUsuario) {
+        List<Factura> recientesPrimero = facturasUsuario.stream()
+                .sorted(Comparator.comparingInt(this::ordenPeriodo).reversed())
+                .toList();
+
+        // Pagar una factura salda las anteriores, que quedan marcadas como impagas: solo cuentan
+        // las seguidas sin pagar desde la más reciente.
+        List<Factura> sinPagar = recientesPrimero.stream().takeWhile(f -> !f.isPagada()).toList();
+        if (sinPagar.isEmpty()) {
+            return Optional.empty();
+        }
+        Factura masAntigua = sinPagar.get(sinPagar.size() - 1);
+        if (!estadoFacturaService.estaVencida(masAntigua.getMes(), masAntigua.getAnio())) {
+            return Optional.empty();
+        }
+
+        Factura ultima = sinPagar.get(0);
+        String ultimoPago = recientesPrimero.stream()
+                .skip(sinPagar.size())
+                .findFirst()
+                .map(f -> f.getFechaPago() != null ? f.getFechaPago().toString() : periodo(f))
+                .orElse(null);
+
+        return Optional.of(DeudorDto.builder()
+                .usuarioId(ultima.getUsuario().getId())
+                .usuarioNombre(ultima.getUsuario().getNombreCompleto())
+                .usuarioActivo(ultima.getUsuario().isActivo())
+                .deuda(val(ultima.getValorTotal()))
+                .facturasSinPagar(sinPagar.size())
+                .debeDesde(periodo(masAntigua))
+                .ultimoPago(ultimoPago)
+                .build());
+    }
+
+    private int ordenPeriodo(Factura f) {
+        return f.getAnio() * 100 + BusinessConstants.MONTH_TO_INT.getOrDefault(f.getMes(), 0);
+    }
+
+    private String periodo(Factura f) {
+        return f.getMes() + " " + f.getAnio();
     }
 
     private void calcularTotales(List<Factura> facturas, InformeDto.InformeDtoBuilder builder) {

@@ -52,6 +52,27 @@ public class InformeDto {
     // Discriminación mensual detallada
     private List<InformeMensualDto> detalleMensual;
 
+    // Usuarios con facturas vencidas a la fecha, del que más debe al que menos
+    private List<DeudorDto> deudores;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeudorDto {
+        private Long usuarioId;
+        private String usuarioNombre;
+        private boolean usuarioActivo;
+        // valorTotal de la última factura: ya incluye lo arrastrado de las anteriores
+        private double deuda;
+        // Facturas seguidas sin pagar, contando desde la más reciente
+        private int facturasSinPagar;
+        // Período de la factura impaga más antigua, ej. "Marzo 2026"
+        private String debeDesde;
+        // Fecha del último pago, o su período si no quedó fecha. Nulo si nunca ha pagado
+        private String ultimoPago;
+    }
+
     @Data
     @Builder
     @NoArgsConstructor

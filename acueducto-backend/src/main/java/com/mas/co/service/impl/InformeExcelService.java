@@ -1,6 +1,7 @@
 package com.mas.co.service.impl;
 
 import com.mas.co.dto.InformeDto;
+import com.mas.co.dto.InformeDto.DeudorDto;
 import com.mas.co.dto.InformeDto.InformeMensualDto;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,8 +44,42 @@ public class InformeExcelService {
             Sheet pagos = wb.createSheet("Método de Pago");
             escribirMetodoPago(pagos, informe, headerStyle, moneyStyle, titleStyle);
 
+            // Hoja 4: Deudores
+            if (informe.getDeudores() != null && !informe.getDeudores().isEmpty()) {
+                Sheet deudores = wb.createSheet("Deudores");
+                escribirDeudores(deudores, informe, headerStyle, moneyStyle);
+            }
+
             wb.write(out);
             return out.toByteArray();
+        }
+    }
+
+    private void escribirDeudores(Sheet sheet, InformeDto inf, CellStyle headerStyle, CellStyle moneyStyle) {
+        int row = 0;
+        Row h = sheet.createRow(row++);
+        String[] headers = {"#", "ID Usuario", "Usuario", "Estado", "Deuda ($)",
+                "Facturas sin pagar", "Debe desde", "Último pago"};
+        for (int i = 0; i < headers.length; i++) {
+            h.createCell(i).setCellValue(headers[i]);
+            h.getCell(i).setCellStyle(headerStyle);
+        }
+
+        for (DeudorDto d : inf.getDeudores()) {
+            Row r = sheet.createRow(row);
+            r.createCell(0).setCellValue(row++);
+            r.createCell(1).setCellValue(d.getUsuarioId());
+            r.createCell(2).setCellValue(d.getUsuarioNombre());
+            r.createCell(3).setCellValue(d.isUsuarioActivo() ? "Activo" : "Inactivo");
+            r.createCell(4).setCellValue(d.getDeuda());
+            r.getCell(4).setCellStyle(moneyStyle);
+            r.createCell(5).setCellValue(d.getFacturasSinPagar());
+            r.createCell(6).setCellValue(d.getDebeDesde());
+            r.createCell(7).setCellValue(d.getUltimoPago() != null ? d.getUltimoPago() : "Nunca ha pagado");
+        }
+
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
         }
     }
 

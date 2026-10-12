@@ -237,6 +237,59 @@
 </div>
 </s:if>
 
+<%-- Usuarios con mayor deuda (a la fecha, no depende del filtro) --%>
+<div class="card fade-in-item mt-4">
+    <div class="card-body p-4">
+        <h6 class="fw-semibold mb-1">
+            <i class="bi bi-person-exclamation me-2 text-danger"></i>Usuarios con Mayor Deuda (a la fecha)
+        </h6>
+        <p class="text-muted mb-3" style="font-size:.8rem;">
+            Usuarios con facturas vencidas, del que m&aacute;s debe al que menos. La deuda es el total de su
+            &uacute;ltima factura, que ya incluye lo acumulado de las anteriores. No depende del a&ntilde;o ni del mes filtrado.
+        </p>
+        <s:if test="informe.deudores != null && informe.deudores.size() > 0">
+            <div class="table-responsive" style="max-height:480px;overflow-y:auto;">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="font-size:.7rem;">#</th>
+                            <th style="font-size:.7rem;">USUARIO</th>
+                            <th class="text-end" style="font-size:.7rem;">DEUDA</th>
+                            <th class="text-center" style="font-size:.7rem;">FACTURAS SIN PAGAR</th>
+                            <th style="font-size:.7rem;">DEBE DESDE</th>
+                            <th style="font-size:.7rem;">&Uacute;LTIMO PAGO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <s:iterator value="informe.deudores" status="fila">
+                            <tr>
+                                <td class="text-muted"><s:property value="#fila.count"/></td>
+                                <td class="fw-semibold">
+                                    <s:property value="usuarioNombre"/>
+                                    <small class="text-muted">#<s:property value="usuarioId"/></small>
+                                    <s:if test="!usuarioActivo">
+                                        <span class="badge-status badge-inactive ms-1">Inactivo</span>
+                                    </s:if>
+                                </td>
+                                <td class="text-end fw-bold text-danger money-format"><s:property value="deuda"/></td>
+                                <td class="text-center"><s:property value="facturasSinPagar"/></td>
+                                <td><s:property value="debeDesde"/></td>
+                                <td>
+                                    <s:if test="ultimoPago != null"><s:property value="ultimoPago"/></s:if>
+                                    <s:else><span class="text-muted">Nunca ha pagado</span></s:else>
+                                </td>
+                            </tr>
+                        </s:iterator>
+                    </tbody>
+                </table>
+            </div>
+        </s:if>
+        <s:else>
+            <p class="text-muted mb-0"><i class="bi bi-check-circle me-1 text-success"></i>No hay usuarios con facturas vencidas.</p>
+        </s:else>
+    </div>
+</div>
+
 <%-- Formateo de valores monetarios en pesos colombianos --%>
 <script>
 (function() {
