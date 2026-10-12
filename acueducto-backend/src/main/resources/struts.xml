@@ -48,6 +48,18 @@
             </result>
         </action>
 
+        <action name="usuarios-excel" class="usuarioAction" method="exportarExcel">
+            <result type="stream">
+                <param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="inputName">excelStream</param>
+                <param name="contentDisposition">attachment;filename="${excelFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">usuarios</param>
+            </result>
+        </action>
+
         <!-- Cuotas CRUD -->
         <action name="cuotas" class="cuotaAction" method="listar">
             <result>/WEB-INF/views/admin/cuotas/lista.jsp</result>
@@ -155,6 +167,18 @@
         <!-- Lecturas / Facturas -->
         <action name="facturas" class="lecturaAction" method="listar">
             <result>/WEB-INF/views/admin/lecturas/lista.jsp</result>
+        </action>
+
+        <action name="facturas-excel" class="lecturaAction" method="exportarExcel">
+            <result type="stream">
+                <param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="inputName">excelStream</param>
+                <param name="contentDisposition">attachment;filename="${excelFileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="error" type="redirectAction">
+                <param name="actionName">facturas</param>
+            </result>
         </action>
 
         <action name="lectura-formulario" class="lecturaAction" method="formulario">

@@ -42,9 +42,15 @@
                 </button>
             </form>
         </div>
-        <a href="<s:url namespace='/admin' action='usuario-formulario'/>" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i> Nuevo Usuario
-        </a>
+        <div class="d-flex gap-2">
+            <a href="<s:url namespace='/admin' action='usuarios-excel'><s:param name='q' value='%{q}'/></s:url>"
+               class="btn btn-outline-success btn-sm" title="Descargar en Excel los usuarios del listado">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+            </a>
+            <a href="<s:url namespace='/admin' action='usuario-formulario'/>" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Nuevo Usuario
+            </a>
+        </div>
     </div>
 
     <%-- Table --%>

@@ -75,9 +75,36 @@
                 </button>
             </form>
         </div>
+        <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item"
+                       href="<s:url namespace='/admin' action='facturas-excel'>
+                                <s:param name='filtro' value='%{filtro}'/>
+                                <s:param name='anioFiltro' value='%{anioFiltro}'/>
+                                <s:param name='q' value='%{q}'/>
+                             </s:url>">
+                        Con los filtros actuales
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                       href="<s:url namespace='/admin' action='facturas-excel'>
+                                <s:param name='todo' value='true'/>
+                             </s:url>">
+                        Todas las facturas
+                    </a>
+                </li>
+            </ul>
+        </div>
         <a href="<s:url namespace='/admin' action='lectura-formulario'/>" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg me-1"></i> Nueva Lectura
         </a>
+        </div>
     </div>
 
     <%-- Table --%>
