@@ -140,6 +140,18 @@
             </result>
         </action>
 
+        <!-- Tarifas (valores y rangos) -->
+        <action name="tarifas" class="valorAction" method="formulario">
+            <result>/WEB-INF/views/admin/tarifas/formulario.jsp</result>
+        </action>
+
+        <action name="tarifas-guardar" class="valorAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">tarifas</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/tarifas/formulario.jsp</result>
+        </action>
+
         <!-- Lecturas / Facturas -->
         <action name="facturas" class="lecturaAction" method="listar">
             <result>/WEB-INF/views/admin/lecturas/lista.jsp</result>

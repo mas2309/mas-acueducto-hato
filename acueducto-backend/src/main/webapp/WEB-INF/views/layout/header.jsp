@@ -47,6 +47,11 @@
             <a href="<s:url namespace='/admin' action='facturas'/>" class="sidebar-link" id="nav-facturas">
                 <i class="bi bi-receipt"></i> Facturas
             </a>
+            <sec:authorize access="hasRole('ESCRITURA')">
+            <a href="<s:url namespace='/admin' action='tarifas'/>" class="sidebar-link" id="nav-tarifas">
+                <i class="bi bi-sliders"></i> Tarifas
+            </a>
+            </sec:authorize>
 
             <div class="sidebar-section">Finanzas</div>
             <a href="<s:url namespace='/admin' action='ingresos'/>" class="sidebar-link" id="nav-ingresos">

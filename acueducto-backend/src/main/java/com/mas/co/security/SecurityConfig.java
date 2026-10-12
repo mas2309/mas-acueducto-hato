@@ -109,6 +109,8 @@ public class SecurityConfig {
                     "/admin/cobro-global-guardar*", "/admin/cobro-global-eliminar*", "/admin/cobro-global-cancelar*",
                     "/admin/cobro-global-pago-anticipado*", "/admin/cobro-global-revertir-anticipado*",
                     "/admin/cobro-global-agregar-usuario*",
+                    // Tarifas: tambien la consulta es exclusiva de ESCRITURA.
+                    "/admin/tarifas*",
                     "/admin/lectura-ingresar*", "/admin/factura-pagar*", "/admin/factura-eliminar*"
                 ).hasRole("ESCRITURA")
                 // Resto del panel (listados, formularios de vista, detalle, exportaciones): lectura para ambos roles.
