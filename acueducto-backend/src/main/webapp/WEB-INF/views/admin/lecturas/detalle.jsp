@@ -113,17 +113,17 @@
                             <td class="text-muted">Cargo Fijo</td>
                             <td class="text-end fw-semibold">$<s:property value="lectura.cargoFijo"/></td>
                         </tr>
-                        <s:if test="lectura.valorCuota != null && lectura.valorCuota > 0">
+                        <s:iterator value="lectura.cuotas">
                             <tr>
                                 <td class="text-muted">
-                                    Cuota
-                                    <s:if test="lectura.cuotaId != null">
-                                        <small class="text-muted">(#<s:property value="lectura.cuotaId"/>)</small>
-                                    </s:if>
+                                    Cuota: <s:property value="descripcion"/>
+                                    <small class="text-muted">
+                                        (<s:if test="numeroCuota != null"><s:property value="numeroCuota"/> de <s:property value="totalCuotas"/>, </s:if>#<s:property value="cuotaId"/>)
+                                    </small>
                                 </td>
-                                <td class="text-end fw-semibold">$<s:property value="lectura.valorCuota"/></td>
+                                <td class="text-end fw-semibold">$<s:property value="valor"/></td>
                             </tr>
-                        </s:if>
+                        </s:iterator>
                         <s:if test="lectura.deudaAnterior != null && lectura.deudaAnterior > 0">
                             <tr>
                                 <td class="text-muted">Deuda Anterior</td>

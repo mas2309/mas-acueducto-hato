@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 /**
  * Entidad Usuario del sistema de acueducto.
@@ -32,6 +33,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+// Al listar facturas o cuotas, sus usuarios se cargan en lotes y no con una consulta por fila
+@BatchSize(size = 100)
 public class Usuario {
 
     @Id

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,6 +110,12 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
            "WHEN 'Septiembre' THEN 9 WHEN 'Octubre' THEN 10 WHEN 'Noviembre' THEN 11 WHEN 'Diciembre' THEN 12 " +
            "END DESC", nativeQuery = true)
     List<Factura> findUltimasFacturasPorUsuario();
+
+    /**
+     * Obtiene todas las facturas de un grupo de usuarios, con su usuario.
+     */
+    @Query("SELECT f FROM Factura f JOIN FETCH f.usuario u WHERE u.id IN :usuarioIds")
+    List<Factura> findByUsuarioIdIn(@Param("usuarioIds") Collection<Long> usuarioIds);
 
     /**
      * Obtiene deuda pendiente de un usuario.

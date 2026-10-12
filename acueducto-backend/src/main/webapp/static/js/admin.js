@@ -92,6 +92,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     confirmIcon.innerHTML = '<i class="bi bi-bank"></i>';
                     confirmBtn.className = 'btn btn-primary';
                     confirmBtn.textContent = 'Sí, pagar';
+                } else if (type === 'prepay') {
+                    confirmTitle.textContent = 'Pago Anticipado';
+                    confirmMsg.innerHTML = '¿Confirma que <strong>' + name + '</strong> pagó por anticipado?<br><small class="text-muted">La cuota no se cobrará más en su factura. El ingreso se registra aparte en Finanzas.</small>';
+                    confirmIcon.className = 'confirm-icon confirm-icon-success';
+                    confirmIcon.innerHTML = '<i class="bi bi-cash-coin"></i>';
+                    confirmBtn.className = 'btn btn-success';
+                    confirmBtn.textContent = 'Sí, registrar';
+                } else if (type === 'revert-prepay') {
+                    confirmTitle.textContent = 'Revertir Pago Anticipado';
+                    confirmMsg.innerHTML = '¿Desea revertir el pago anticipado de <strong>' + name + '</strong>?<br><small class="text-muted">La cuota volverá a cobrarse en su factura.</small>';
+                    confirmIcon.className = 'confirm-icon confirm-icon-warning';
+                    confirmIcon.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                    confirmBtn.className = 'btn btn-warning';
+                    confirmBtn.textContent = 'Sí, revertir';
+                } else if (type === 'cancel-charge') {
+                    confirmTitle.textContent = 'Cancelar Cobro Global';
+                    confirmMsg.innerHTML = '¿Desea cancelar <strong>' + name + '</strong>?<br><small class="text-muted">Las cuotas pendientes de todos los usuarios dejarán de cobrarse. Esta acción no se puede deshacer.</small>';
+                    confirmIcon.className = 'confirm-icon confirm-icon-warning';
+                    confirmIcon.innerHTML = '<i class="bi bi-slash-circle"></i>';
+                    confirmBtn.className = 'btn btn-warning';
+                    confirmBtn.textContent = 'Sí, cancelar cobro';
                 }
 
                 confirmBtn.onclick = function () {

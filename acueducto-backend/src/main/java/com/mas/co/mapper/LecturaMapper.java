@@ -1,10 +1,12 @@
 package com.mas.co.mapper;
 
+import com.mas.co.dto.CuotaFacturaDto;
 import com.mas.co.dto.LecturaDto;
-import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.FacturaCuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.service.impl.EstadoFacturaService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ public class LecturaMapper {
         factura.getAnio()
     );
 
+    List<CuotaFacturaDto> cuotas = factura.getCuotas().stream().map(this::toCuotaDto).toList();
+
     return LecturaDto.builder()
         .id(factura.getId())
         .usuarioId(factura.getUsuario().getId())
@@ -46,7 +50,8 @@ public class LecturaMapper {
         .otrosCobros(factura.getOtrosCobros())
         .otrosCobrosDescripcion(factura.getOtrosCobrosDescripcion())
         .deudaAnterior(factura.getDeudaAnterior())
-        .cuotaId(factura.getCuota() != null ? factura.getCuota().getId() : null)
+        .cuotaId(cuotas.isEmpty() ? null : cuotas.get(0).getCuotaId())
+        .cuotas(cuotas)
         .valorCuota(factura.getValorCuota())
         .cargoFijo(factura.getCargoFijo())
         .valorTotal(factura.getValorTotal())
@@ -66,11 +71,6 @@ public class LecturaMapper {
 
     Usuario usuario = Usuario.builder().id(dto.getUsuarioId()).build();
 
-    Cuota cuota = null;
-    if (dto.getCuotaId() != null) {
-      cuota = Cuota.builder().id(dto.getCuotaId()).build();
-    }
-
     return Factura.builder()
         .mes(dto.getMes())
         .anio(dto.getAnio())
@@ -86,8 +86,17 @@ public class LecturaMapper {
         .valorTotal(dto.getValorTotal())
         .fechaIngreso(dto.getFechaIngreso())
         .usuario(usuario)
-        .cuota(cuota)
         .noPago(dto.getNoPago())
+        .build();
+  }
+
+  private CuotaFacturaDto toCuotaDto(FacturaCuota facturaCuota) {
+    return CuotaFacturaDto.builder()
+        .cuotaId(facturaCuota.getCuota().getId())
+        .descripcion(facturaCuota.getDescripcion())
+        .numeroCuota(facturaCuota.getNumeroCuota())
+        .totalCuotas(facturaCuota.getTotalCuotas())
+        .valor(facturaCuota.getValor())
         .build();
   }
 }

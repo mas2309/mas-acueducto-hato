@@ -9,18 +9,11 @@
 	<parameter name="metros_consumidos" class="java.lang.Integer"/>
 	<parameter name="consumo_actual" class="java.lang.Integer"/>
 	<parameter name="consumo_anterior" class="java.lang.Integer"/>
-	<parameter name="cargo_fijo" class="java.math.BigDecimal"/>
-	<parameter name="valor_consumo" class="java.math.BigDecimal"/>
-	<parameter name="deuda_anterior" class="java.math.BigDecimal"/>
+	<parameter name="conceptos" class="java.util.List"/>
+	<parameter name="valores" class="java.util.List"/>
 	<parameter name="total" class="java.lang.String"/>
-	<parameter name="descripcion" class="java.lang.String"/>
-	<parameter name="otros_cobros" class="java.math.BigDecimal"/>
-	<parameter name="descripcion_cuota" class="java.lang.String"/>
-	<parameter name="cuota_actual" class="java.lang.Integer"/>
-	<parameter name="numero_de_cuotas" class="java.lang.Integer"/>
-	<parameter name="valor_cuota" class="java.math.BigDecimal"/>
+	<parameter name="nota" class="java.lang.String"/>
 	<parameter name="ruta_imagen" class="java.lang.String"/>
-	<parameter name="no_pago" class="java.math.BigDecimal"/>
 	<parameter name="mes" class="java.lang.String"/>
 	<query language="sql"><![CDATA[]]></query>
 	<background splitType="Stretch"/>
@@ -278,69 +271,101 @@
 		<element kind="staticText" uuid="c21e93cd-d106-43a4-8eb7-c19680300295" x="291" y="133" width="252" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[DESCRIPCIÓN]]></text>
 		</element>
-		<element kind="staticText" uuid="15e7b402-448f-4326-b8c6-6e94726f8966" x="21" y="147" width="199" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
-			<text><![CDATA[CARGO FIJO]]></text>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000001" x="21" y="147" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(0)]]></expression>
 		</element>
-		<element kind="textField" uuid="36368088-ae0d-419e-8558-78707c16b976" x="220" y="147" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA["$ " + $P{cargo_fijo}]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000002" x="220" y="147" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(0)]]></expression>
 		</element>
-		<element kind="staticText" uuid="da9f41fb-2eb6-4767-9aab-6db81df7435a" x="21" y="159" width="199" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
-			<text><![CDATA[CONSUMO]]></text>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000003" x="293" y="147" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(0)]]></expression>
 		</element>
-		<element kind="textField" uuid="1c1300b2-0182-4a9a-885d-23a196e8018d" x="220" y="159" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA["$ " + $P{valor_consumo}]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000004" x="482" y="147" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(0)]]></expression>
 		</element>
-		<element kind="textField" uuid="684a8057-8867-410d-997b-e9f87af4bcfb" x="21" y="171" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "DEUDA ANTERIOR": ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000005" x="21" y="157" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(1)]]></expression>
 		</element>
-		<element kind="textField" uuid="f4d8ea3e-962b-433f-81c3-a85e6abd4fe8" x="220" y="171" width="70" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{deuda_anterior}: ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000006" x="220" y="157" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(1)]]></expression>
 		</element>
-		<element kind="textField" uuid="fcd18b85-7840-438d-9dd4-84a3967ba693" x="220" y="183" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{cuota_actual} != null? $P{cuota_actual}<=$P{numero_de_cuotas}? "$ " + $P{valor_cuota} : "-": ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000007" x="293" y="157" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(1)]]></expression>
 		</element>
-		<element kind="textField" uuid="af68a857-7c9b-488e-9098-521eeb15ff25" x="21" y="183" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{cuota_actual} !=null ?($P{cuota_actual}<=$P{numero_de_cuotas}? $P{descripcion_cuota}
-+ "(" +$P{numero_de_cuotas} + "/" + $P{cuota_actual} + ")"
-: "-"): ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000008" x="482" y="157" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(1)]]></expression>
 		</element>
-		<element kind="textField" uuid="e51e1472-efa1-4ade-aeaf-1eea261e3c8c" x="21" y="195" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? $P{descripcion} : ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000009" x="21" y="167" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(2)]]></expression>
 		</element>
-		<element kind="textField" uuid="775f1268-11fd-4fcb-a0d7-d13946662c4c" x="220" y="195" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " +  $P{otros_cobros} : ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000010" x="220" y="167" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(2)]]></expression>
 		</element>
-		<element kind="staticText" uuid="471b3214-212f-44f1-80e2-338daeb63b5f" x="293" y="147" width="189" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
-			<text><![CDATA[CARGO FIJO]]></text>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000011" x="293" y="167" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(2)]]></expression>
 		</element>
-		<element kind="textField" uuid="308d31df-f396-4dc2-868b-dc5250761110" x="482" y="147" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA["$ " + $P{cargo_fijo}]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000012" x="482" y="167" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(2)]]></expression>
 		</element>
-		<element kind="staticText" uuid="d15ecb9d-9cb5-4184-b076-6d99d500da33" x="293" y="159" width="189" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
-			<text><![CDATA[CONSUMO]]></text>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000013" x="21" y="177" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(3)]]></expression>
 		</element>
-		<element kind="textField" uuid="a1406d0a-38f9-45de-aed1-d5599fe94819" x="482" y="159" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA["$ " + $P{valor_consumo}]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000014" x="220" y="177" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(3)]]></expression>
 		</element>
-		<element kind="textField" uuid="f6f32803-7e15-4b74-8c22-d88ed660a54f" x="293" y="171" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "DEUDA ANTERIOR": ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000015" x="293" y="177" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(3)]]></expression>
 		</element>
-		<element kind="textField" uuid="a6ad9f5f-586d-4aa4-a1b7-60aab40ea7f6" x="293" y="183" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{cuota_actual} !=null ?($P{cuota_actual}<=$P{numero_de_cuotas}? $P{descripcion_cuota}
-+ "(" +$P{numero_de_cuotas} + "/" + $P{cuota_actual} + ")"
-: "-"): ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000016" x="482" y="177" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(3)]]></expression>
 		</element>
-		<element kind="textField" uuid="d953e44b-11c2-4011-9c03-b0a2b219a29d" x="293" y="195" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? $P{descripcion} : ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000017" x="21" y="187" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(4)]]></expression>
 		</element>
-		<element kind="textField" uuid="ae2ea1dc-b24f-44d5-8f75-c4e5ccbd46b3" x="482" y="195" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{otros_cobros}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{otros_cobros} : ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000018" x="220" y="187" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(4)]]></expression>
 		</element>
-		<element kind="textField" uuid="16a25789-a93b-4cc9-9c33-f16ed8124c6c" x="482" y="183" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{cuota_actual} != null? $P{cuota_actual}<=$P{numero_de_cuotas}? "$ " + $P{valor_cuota} : "-": ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000019" x="293" y="187" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(4)]]></expression>
 		</element>
-		<element kind="textField" uuid="27812068-51bc-427c-af5d-f93f037c27e1" x="482" y="171" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{deuda_anterior}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{deuda_anterior}: ""]]></expression>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000020" x="482" y="187" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(4)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000021" x="21" y="197" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(5)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000022" x="220" y="197" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(5)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000023" x="293" y="197" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(5)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000024" x="482" y="197" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(5)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000025" x="21" y="207" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(6)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000026" x="220" y="207" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(6)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000027" x="293" y="207" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(6)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000028" x="482" y="207" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(6)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000029" x="21" y="217" width="199" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(7)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000030" x="220" y="217" width="70" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(7)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000031" x="293" y="217" width="189" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{conceptos}.get(7)]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000032" x="482" y="217" width="61" height="10" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
+			<expression><![CDATA[(String) $P{valores}.get(7)]]></expression>
 		</element>
 		<element kind="staticText" uuid="8861b481-54ab-4068-9260-b365540acad1" x="10" y="227" width="210" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[TOTAL]]></text>
@@ -348,11 +373,17 @@
 		<element kind="textField" uuid="5654e82b-a5df-4d4e-b8ec-dd9df97a075a" x="222" y="227" width="68" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<expression><![CDATA["$ " + $P{total}]]></expression>
 		</element>
-		<element kind="staticText" uuid="0a13a7ea-85ae-4b74-a3b8-ee0be14da907" x="10" y="239" width="280" height="51" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+		<element kind="staticText" uuid="0a13a7ea-85ae-4b74-a3b8-ee0be14da907" x="10" y="239" width="280" height="30" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede Duitama o
 corresponsales bancarios a nivel nacional. Recuerde reportar su pago al número
 3005641323 vía whatsapp
 ]]></text>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000101" x="10" y="270" width="280" height="28" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nota}]]></expression>
+		</element>
+		<element kind="textField" uuid="c0b20901-0000-4000-8000-000000000102" x="293" y="270" width="250" height="28" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{nota}]]></expression>
 		</element>
 		<element kind="staticText" uuid="fc5f2551-8af4-4aa7-8682-fb9192a2e068" x="10" y="299" width="281" height="12" fontSize="8.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[USUARIO]]></text>
@@ -363,7 +394,7 @@ corresponsales bancarios a nivel nacional. Recuerde reportar su pago al número
 		<element kind="textField" uuid="e8b77230-5ac5-41c8-aa63-40a9eeb6887f" x="482" y="227" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<expression><![CDATA["$ " + $P{total}]]></expression>
 		</element>
-		<element kind="staticText" uuid="094590c0-4736-4eaa-a053-7c1cd6394cc9" x="293" y="239" width="250" height="51" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+		<element kind="staticText" uuid="094590c0-4736-4eaa-a053-7c1cd6394cc9" x="293" y="239" width="250" height="30" fontSize="6.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[Pago por consignación: 415073002899 Banco Agrario sede
 Duitama o corresponsales bancarios a nivel nacional. Recuerde
 reportar su pago al número 3005641323 vía whatsapp]]></text>
@@ -373,18 +404,6 @@ reportar su pago al número 3005641323 vía whatsapp]]></text>
 		</element>
 		<element kind="textField" uuid="382b50c5-02e2-4286-8406-80fc718261a6" x="390" y="110" width="34" height="11" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<expression><![CDATA[$P{lectura_actual}]]></expression>
-		</element>
-		<element kind="textField" uuid="7db9275f-f8cf-43f2-8729-2a467f383910" x="21" y="210" width="199" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "No Pago" : ""]]></expression>
-		</element>
-		<element kind="textField" uuid="dacda8c9-9197-4804-aace-6bc3d9456952" x="221" y="210" width="71" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[ $P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{no_pago} : ""]]></expression>
-		</element>
-		<element kind="textField" uuid="f72f0b72-5509-4e0c-b2b7-eaeb3540180d" x="292" y="210" width="189" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "No Pago" : ""]]></expression>
-		</element>
-		<element kind="textField" uuid="d4ab7b0d-6e6f-47e9-8d5a-55e0ba9593e0" x="482" y="210" width="61" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
-			<expression><![CDATA[$P{no_pago}.compareTo(new java.math.BigDecimal("0.0")) > 0 ? "$ " + $P{no_pago} : ""]]></expression>
 		</element>
 		<element kind="staticText" uuid="c0c6ba97-5f88-4cff-acdc-91ecebc9fafb" x="111" y="73" width="29" height="12" fontName="Arial Rounded MT Bold" fontSize="8.0" hTextAlign="Center">
 			<text><![CDATA[MES]]></text>

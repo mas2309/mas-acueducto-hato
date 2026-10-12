@@ -35,6 +35,8 @@ public class CuotaMapper {
                 .activo(cuota.getActivo())
                 .usuarioId(cuota.getUsuario().getId())
                 .usuarioNombre(cuota.getUsuario().getNombreCompleto())
+                .cobroGlobalId(cuota.getCobroGlobal() != null ? cuota.getCobroGlobal().getId() : null)
+                .pagoAnticipado(cuota.getPagoAnticipado())
                 .build();
     }
 

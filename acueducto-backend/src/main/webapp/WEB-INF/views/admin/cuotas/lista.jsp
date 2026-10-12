@@ -67,7 +67,17 @@
                     <s:iterator value="cuotas">
                         <tr class="fade-in-item">
                             <td class="fw-semibold">#<s:property value="id"/></td>
-                            <td><s:property value="descripcion"/></td>
+                            <td>
+                                <s:property value="descripcion"/>
+                                <s:if test="cobroGlobalId != null">
+                                    <a href="<s:url namespace='/admin' action='cobro-global-detalle'>
+                                                <s:param name='id' value='cobroGlobalId'/>
+                                             </s:url>"
+                                       class="text-decoration-none" title="Ver cobro global">
+                                        <small><i class="bi bi-collection"></i> Global</small>
+                                    </a>
+                                </s:if>
+                            </td>
                             <td>
                                 <span class="text-muted">
                                     <i class="bi bi-person me-1"></i><s:property value="usuarioNombre"/>

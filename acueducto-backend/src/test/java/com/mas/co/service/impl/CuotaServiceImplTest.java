@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.mas.co.dto.CuotaDto;
+import com.mas.co.entity.CobroGlobal;
 import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.exception.BusinessException;
@@ -204,6 +205,69 @@ class CuotaServiceImplTest {
 
     assertFalse(cuota.getActivo());
     verify(cuotaRepository).save(cuota);
+  }
+
+  @Test
+  @DisplayName("Debe registrar pago anticipado y dejar de cobrar la cuota")
+  void debeRegistrarPagoAnticipado() {
+    cuota.setCuotaActual(1);
+    when(cuotaRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(cuota));
+    when(cuotaRepository.save(cuota)).thenReturn(cuota);
+    when(cuotaMapper.toDto(cuota)).thenReturn(cuotaDto);
+
+    cuotaService.registrarPagoAnticipado(1L);
+
+    assertTrue(cuota.getPagoAnticipado());
+    assertFalse(cuota.getActivo());
+    assertEquals(1, cuota.getCuotaActual());
+    verify(cuotaRepository).save(cuota);
+  }
+
+  @Test
+  @DisplayName("Debe lanzar excepción al registrar pago anticipado de cuota inactiva")
+  void debeLanzarExcepcionAlRegistrarPagoAnticipadoDeCuotaInactiva() {
+    when(cuotaRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.empty());
+
+    assertThrows(BusinessException.class, () -> cuotaService.registrarPagoAnticipado(1L));
+    verify(cuotaRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Debe revertir pago anticipado y reactivar la cuota")
+  void debeRevertirPagoAnticipado() {
+    cuota.setPagoAnticipado(true);
+    cuota.setActivo(false);
+    when(cuotaRepository.findById(1L)).thenReturn(Optional.of(cuota));
+    when(cuotaRepository.save(cuota)).thenReturn(cuota);
+    when(cuotaMapper.toDto(cuota)).thenReturn(cuotaDto);
+
+    cuotaService.revertirPagoAnticipado(1L);
+
+    assertFalse(cuota.getPagoAnticipado());
+    assertTrue(cuota.getActivo());
+    verify(cuotaRepository).save(cuota);
+  }
+
+  @Test
+  @DisplayName("Debe lanzar excepción al revertir una cuota sin pago anticipado")
+  void debeLanzarExcepcionAlRevertirCuotaSinPagoAnticipado() {
+    when(cuotaRepository.findById(1L)).thenReturn(Optional.of(cuota));
+
+    assertThrows(BusinessException.class, () -> cuotaService.revertirPagoAnticipado(1L));
+    verify(cuotaRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Debe lanzar excepción al revertir pago anticipado de un cobro global cancelado")
+  void debeLanzarExcepcionAlRevertirPagoAnticipadoDeCobroCancelado() {
+    cuota.setPagoAnticipado(true);
+    cuota.setActivo(false);
+    cuota.setCobroGlobal(CobroGlobal.builder().id(10L).activo(false).build());
+    when(cuotaRepository.findById(1L)).thenReturn(Optional.of(cuota));
+
+    assertThrows(BusinessException.class, () -> cuotaService.revertirPagoAnticipado(1L));
+    assertFalse(cuota.getActivo());
+    verify(cuotaRepository, never()).save(any());
   }
 
   @Test

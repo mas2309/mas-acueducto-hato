@@ -14,6 +14,12 @@ public class BusinessException extends BaseException {
     public static final String INVOICE_NOT_FOUND = "INVOICE_NOT_FOUND";
     public static final String QUOTA_NOT_FOUND = "QUOTA_NOT_FOUND";
     public static final String QUOTA_NOT_ACTIVE = "QUOTA_NOT_ACTIVE";
+    public static final String QUOTA_NOT_PREPAID = "QUOTA_NOT_PREPAID";
+    public static final String GLOBAL_CHARGE_NOT_FOUND = "GLOBAL_CHARGE_NOT_FOUND";
+    public static final String GLOBAL_CHARGE_NOT_ACTIVE = "GLOBAL_CHARGE_NOT_ACTIVE";
+    public static final String GLOBAL_CHARGE_ALREADY_INVOICED = "GLOBAL_CHARGE_ALREADY_INVOICED";
+    public static final String GLOBAL_CHARGE_WITHOUT_USERS = "GLOBAL_CHARGE_WITHOUT_USERS";
+    public static final String USER_ALREADY_IN_GLOBAL_CHARGE = "USER_ALREADY_IN_GLOBAL_CHARGE";
     public static final String VALUES_NOT_CONFIGURED = "VALUES_NOT_CONFIGURED";
     public static final String CONSECUTIVE_NO_PAYMENTS = "CONSECUTIVE_NO_PAYMENTS";
     public static final String INVOICE_ALREADY_PAID = "INVOICE_ALREADY_PAID";
@@ -78,6 +84,53 @@ public class BusinessException extends BaseException {
             QUOTA_NOT_ACTIVE,
             String.format("La cuota con ID %d no está activa para procesar pagos", quotaId),
             quotaId
+        );
+    }
+
+    public static BusinessException quotaNotPrepaid(Long quotaId) {
+        return new BusinessException(
+            QUOTA_NOT_PREPAID,
+            String.format("La cuota con ID %d no tiene un pago anticipado registrado", quotaId),
+            quotaId
+        );
+    }
+
+    public static BusinessException globalChargeNotFound(Long globalChargeId) {
+        return new BusinessException(
+            GLOBAL_CHARGE_NOT_FOUND,
+            String.format("Cobro global con ID %d no encontrado", globalChargeId),
+            globalChargeId
+        );
+    }
+
+    public static BusinessException globalChargeNotActive(Long globalChargeId) {
+        return new BusinessException(
+            GLOBAL_CHARGE_NOT_ACTIVE,
+            String.format("El cobro global con ID %d está cancelado", globalChargeId),
+            globalChargeId
+        );
+    }
+
+    public static BusinessException globalChargeAlreadyInvoiced(Long globalChargeId) {
+        return new BusinessException(
+            GLOBAL_CHARGE_ALREADY_INVOICED,
+            String.format("El cobro global con ID %d ya tiene cuotas facturadas o pagos anticipados y no se puede eliminar. Puede cancelarlo", globalChargeId),
+            globalChargeId
+        );
+    }
+
+    public static BusinessException globalChargeWithoutUsers() {
+        return new BusinessException(
+            GLOBAL_CHARGE_WITHOUT_USERS,
+            "No hay usuarios activos a los que aplicar el cobro global"
+        );
+    }
+
+    public static BusinessException userAlreadyInGlobalCharge(Long userId, Long globalChargeId) {
+        return new BusinessException(
+            USER_ALREADY_IN_GLOBAL_CHARGE,
+            String.format("El usuario %d ya tiene cuota en el cobro global %d", userId, globalChargeId),
+            userId, globalChargeId
         );
     }
 

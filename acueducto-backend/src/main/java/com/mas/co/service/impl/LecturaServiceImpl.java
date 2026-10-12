@@ -1,10 +1,12 @@
 package com.mas.co.service.impl;
 
 import com.mas.co.constants.BusinessConstants;
+import com.mas.co.dto.CuotaDto;
 import com.mas.co.dto.LecturaDto;
 import com.mas.co.dto.PagoDto;
 import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.FacturaCuota;
 import com.mas.co.entity.Usuario;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.mapper.LecturaMapper;
@@ -19,7 +21,6 @@ import com.mas.co.usecase.ObtenerLecturaAnteriorUseCase;
 import com.mas.co.usecase.ValidarPeriodoConsecutivoUseCase;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -108,19 +109,11 @@ public class LecturaServiceImpl implements LecturaService {
     // 5. Obtener Deuda Anterior
     lecturaDto.setDeudaAnterior(obtenerDeudaAnteriorUseCase.execute(lecturaDto.getUsuarioId()));
 
-    // 6. Procesar Cuota Activa
-    Optional<Cuota> cuotaActivaOpt = cuotaRepository.findFirstByUsuarioIdAndActivoTrueOrderByFechaInsertDesc(lecturaDto.getUsuarioId());
-    Cuota cuotaParaFactura = null;
-    if (cuotaActivaOpt.isPresent()) {
-      Cuota cuotaActiva = cuotaActivaOpt.get();
-      log.debug("Cuota activa encontrada con ID: {}", cuotaActiva.getId());
-      cuotaService.procesarPagoCuota(cuotaActiva.getId());
-      lecturaDto.setCuotaId(cuotaActiva.getId());
-      lecturaDto.setValorCuota(cuotaActiva.getValorCuota());
-      cuotaParaFactura = cuotaActiva;
-    } else {
-      lecturaDto.setValorCuota(0.0);
-    }
+    // 6. Procesar Cuotas Activas
+    List<FacturaCuota> cuotasCobradas = cuotaRepository.findByUsuarioIdAndActivoTrueOrderByIdAsc(lecturaDto.getUsuarioId())
+        .stream().map(this::cobrarCuota).toList();
+    log.debug("Cuotas activas cobradas: {}", cuotasCobradas.size());
+    lecturaDto.setValorCuota(cuotasCobradas.stream().mapToDouble(FacturaCuota::getValor).sum());
 
     // 7. Calcular todos los valores de la factura
     calcularValoresFacturaUseCase.execute(lecturaDto);
@@ -128,9 +121,7 @@ public class LecturaServiceImpl implements LecturaService {
     // 8. Crear y Guardar Factura
     Factura factura = lecturaMapper.toEntity(lecturaDto);
     factura.setUsuario(usuario);
-    if (cuotaParaFactura != null) {
-      factura.setCuota(cuotaParaFactura);
-    }
+    cuotasCobradas.forEach(factura::agregarCuota);
 
     Factura facturaGuardada = facturaRepository.save(factura);
     log.info("Lectura ingresada exitosamente - Factura ID: {} para usuario: {}", facturaGuardada.getId(), usuario.getNombreCompleto());
@@ -229,10 +220,10 @@ public class LecturaServiceImpl implements LecturaService {
     validarActualizacionFactura(facturaExistente, lecturaDto);
     lecturaDto.setConsumo(lecturaDto.getLecturaActual() - lecturaDto.getLecturaAnterior());
     
-    Cuota nuevaCuota = procesarCambioCuota(facturaExistente.getCuota(), lecturaDto);
+    procesarCambioCuotas(facturaExistente, lecturaDto);
     calcularValoresFacturaUseCase.execute(lecturaDto);
     ajustarValoresSiPagada(facturaExistente, lecturaDto);
-    actualizarEntidadFactura(facturaExistente, lecturaDto, nuevaCuota);
+    actualizarEntidadFactura(facturaExistente, lecturaDto);
     
     Factura facturaActualizada = facturaRepository.save(facturaExistente);
     log.info("Factura actualizada exitosamente - ID: {}", facturaId);
@@ -259,29 +250,65 @@ public class LecturaServiceImpl implements LecturaService {
     }
   }
 
-  private Cuota procesarCambioCuota(Cuota cuotaAnterior, LecturaDto lecturaDto) {
+  private FacturaCuota cobrarCuota(Cuota cuota) {
+    CuotaDto cuotaCobrada = cuotaService.procesarPagoCuota(cuota.getId());
+    return FacturaCuota.builder()
+        .cuota(cuota)
+        .descripcion(cuotaCobrada.getDescripcion())
+        .numeroCuota(cuotaCobrada.getCuotaActual())
+        .totalCuotas(cuotaCobrada.getNumeroCuota())
+        .valor(cuotaCobrada.getValorCuota())
+        .build();
+  }
+
+  private void procesarCambioCuotas(Factura factura, LecturaDto lecturaDto) {
+    List<Long> cuotaIds = resolverCuotaIds(factura, lecturaDto);
+
+    List<Cuota> cuotasNuevas = cuotaIds.stream()
+        .filter(cuotaId -> !obtenerCuotaIds(factura).contains(cuotaId))
+        .map(cuotaId -> cuotaRepository.findById(cuotaId)
+            .orElseThrow(() -> BusinessException.quotaNotFound(cuotaId)))
+        .toList();
+
+    List<FacturaCuota> cuotasRetiradas = factura.getCuotas().stream()
+        .filter(facturaCuota -> !cuotaIds.contains(facturaCuota.getCuota().getId()))
+        .toList();
+    cuotasRetiradas.forEach(facturaCuota -> revertirCuota(facturaCuota.getCuota()));
+    factura.getCuotas().removeAll(cuotasRetiradas);
+
+    cuotasNuevas.forEach(cuota -> factura.agregarCuota(cobrarCuota(cuota)));
+
+    lecturaDto.setValorCuota(factura.sumarCuotas());
+  }
+
+  private List<Long> resolverCuotaIds(Factura factura, LecturaDto lecturaDto) {
+    if (lecturaDto.getCuotaIds() != null) {
+      return lecturaDto.getCuotaIds();
+    }
     if (lecturaDto.getCuotaId() == null) {
-      revertirCuota(cuotaAnterior);
-      lecturaDto.setValorCuota(0.0);
-      return null;
+      return List.of();
     }
-    
-    Cuota nuevaCuota = cuotaRepository.findById(lecturaDto.getCuotaId())
-        .orElseThrow(() -> BusinessException.quotaNotFound(lecturaDto.getCuotaId()));
-    
-    if (cuotaAnterior == null || !cuotaAnterior.getId().equals(nuevaCuota.getId())) {
-      revertirCuota(cuotaAnterior);
-      cuotaService.procesarPagoCuota(nuevaCuota.getId());
-    }
-    
-    lecturaDto.setValorCuota(nuevaCuota.getValorCuota());
-    return nuevaCuota;
+    // Un cliente que solo maneja cuotaId reenvía la primera cuota de la factura: en ese caso se
+    // conservan todas para no quitar las demás.
+    List<Long> cuotaIdsActuales = obtenerCuotaIds(factura);
+    return cuotaIdsActuales.contains(lecturaDto.getCuotaId())
+        ? cuotaIdsActuales
+        : List.of(lecturaDto.getCuotaId());
+  }
+
+  private List<Long> obtenerCuotaIds(Factura factura) {
+    return factura.getCuotas().stream()
+        .map(facturaCuota -> facturaCuota.getCuota().getId())
+        .toList();
   }
 
   private void revertirCuota(Cuota cuota) {
     if (cuota != null && cuota.getCuotaActual() > 0) {
       cuota.setCuotaActual(cuota.getCuotaActual() - 1);
-      cuota.setActivo(true);
+      // Una cuota pagada por anticipado no debe volver a cobrarse en la factura
+      if (!Boolean.TRUE.equals(cuota.getPagoAnticipado())) {
+        cuota.setActivo(true);
+      }
       cuotaRepository.save(cuota);
       log.debug("Cuota {} revertida", cuota.getId());
     }
@@ -297,7 +324,7 @@ public class LecturaServiceImpl implements LecturaService {
     }
   }
 
-  private void actualizarEntidadFactura(Factura factura, LecturaDto dto, Cuota cuota) {
+  private void actualizarEntidadFactura(Factura factura, LecturaDto dto) {
     factura.setMes(dto.getMes());
     factura.setAnio(dto.getAnio());
     factura.setLecturaActual(dto.getLecturaActual());
@@ -311,7 +338,6 @@ public class LecturaServiceImpl implements LecturaService {
     factura.setValorCuota(dto.getValorCuota());
     factura.setNoPago(dto.getNoPago());
     factura.setValorTotal(dto.getValorTotal());
-    factura.setCuota(cuota);
     factura.setFechaActualizacion(LocalDate.now());
   }
 
@@ -323,7 +349,7 @@ public class LecturaServiceImpl implements LecturaService {
     Factura factura = facturaRepository.findById(facturaId)
         .orElseThrow(() -> BusinessException.invoiceNotFound(facturaId));
     
-    revertirCuota(factura.getCuota());
+    factura.getCuotas().forEach(facturaCuota -> revertirCuota(facturaCuota.getCuota()));
     facturaRepository.deleteById(facturaId);
     log.info("Factura eliminada exitosamente - ID: {}", facturaId);
   }

@@ -1,11 +1,14 @@
 package com.mas.co.service.impl;
 
 import com.mas.co.config.CacheConfig;
+import com.mas.co.dto.ValoresDto;
 import com.mas.co.entity.Valores;
+import com.mas.co.exception.ValidationException;
 import com.mas.co.repository.ValorRepository;
 import com.mas.co.service.ValorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,6 +118,68 @@ public class ValorServiceImpl implements ValorService {
 
     log.debug("Valor total calculado: {}", valorTotal);
     return valorTotal;
+  }
+
+  @Override
+  @Transactional
+  @CacheEvict(value = CacheConfig.CACHE_VALORES, allEntries = true)
+  public Valores actualizarValores(ValoresDto valoresDto) {
+    validarValores(valoresDto);
+
+    Valores valores = valorRepository.findFirstByOrderByIdDesc().orElseGet(Valores::new);
+    valores.setCargoFijo(valoresDto.getCargoFijo());
+    valores.setNoPago(valoresDto.getNoPago());
+    valores.setRangoUno(valoresDto.getRangoUno().doubleValue());
+    valores.setRangoDos(valoresDto.getRangoDos().doubleValue());
+    valores.setRangoTres(valoresDto.getRangoTres().doubleValue());
+    // El rango 4 no tiene límite: empieza donde termina el rango 3
+    valores.setRangoCuatro(valoresDto.getRangoTres() + 1.0);
+    valores.setValorUno(valoresDto.getValorUno());
+    valores.setValorDos(valoresDto.getValorDos());
+    valores.setValorTres(valoresDto.getValorTres());
+    valores.setValorCuatro(valoresDto.getValorCuatro());
+
+    Valores valoresActualizados = valorRepository.save(valores);
+    log.info(
+        "Valores actualizados - Cargo fijo: {}, No pago: {}, Rangos: {}/{}/{}, Tarifas: {}/{}/{}/{}",
+        valores.getCargoFijo(),
+        valores.getNoPago(),
+        valores.getRangoUno(),
+        valores.getRangoDos(),
+        valores.getRangoTres(),
+        valores.getValorUno(),
+        valores.getValorDos(),
+        valores.getValorTres(),
+        valores.getValorCuatro());
+    return valoresActualizados;
+  }
+
+  private void validarValores(ValoresDto dto) {
+    validarNoNegativo(dto.getCargoFijo(), "El cargo fijo");
+    validarNoNegativo(dto.getNoPago(), "El recargo por no pago");
+    validarNoNegativo(dto.getValorUno(), "El valor del rango 1");
+    validarNoNegativo(dto.getValorDos(), "El valor del rango 2");
+    validarNoNegativo(dto.getValorTres(), "El valor del rango 3");
+    validarNoNegativo(dto.getValorCuatro(), "El valor del rango 4");
+
+    if (dto.getRangoUno() == null || dto.getRangoDos() == null || dto.getRangoTres() == null) {
+      throw new ValidationException("Los límites de los rangos son obligatorios");
+    }
+    if (dto.getRangoUno() <= 0) {
+      throw new ValidationException("El límite del rango 1 debe ser mayor a 0");
+    }
+    if (dto.getRangoDos() <= dto.getRangoUno() || dto.getRangoTres() <= dto.getRangoDos()) {
+      throw new ValidationException("Los límites de los rangos deben ir de menor a mayor");
+    }
+  }
+
+  private void validarNoNegativo(Number valor, String campo) {
+    if (valor == null) {
+      throw new ValidationException(campo + " es obligatorio");
+    }
+    if (valor.doubleValue() < 0) {
+      throw new ValidationException(campo + " no puede ser negativo");
+    }
   }
 
   /** Obtiene valores por defecto cuando no están configurados en BD. */

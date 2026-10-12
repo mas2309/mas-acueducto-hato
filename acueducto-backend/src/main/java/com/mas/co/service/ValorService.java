@@ -1,5 +1,6 @@
 package com.mas.co.service;
 
+import com.mas.co.dto.ValoresDto;
 import com.mas.co.entity.Valores;
 
 /**
@@ -24,4 +25,13 @@ public interface ValorService {
      * @return valor calculado
      */
     Double calcularValorConsumo(Integer consumo);
+
+    /**
+     * Actualiza la configuración de valores. Aplica a las facturas que se generen o editen
+     * desde ese momento.
+     *
+     * @param valoresDto nuevos valores
+     * @return configuración actualizada
+     */
+    Valores actualizarValores(ValoresDto valoresDto);
 }

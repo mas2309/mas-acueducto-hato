@@ -2,6 +2,10 @@ package com.mas.co.web.action;
 
 import com.mas.co.dto.UsuarioDto;
 import com.mas.co.service.UsuarioService;
+import com.mas.co.service.impl.ListadoExcelService;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,9 @@ public class UsuarioAction extends BaseAction {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private ListadoExcelService listadoExcelService;
+
     private UsuarioDto usuario;
     private List<UsuarioDto> usuarios;
     private Long id;
@@ -32,20 +39,48 @@ public class UsuarioAction extends BaseAction {
     // Búsqueda
     private String q;
 
-    public String listar() {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("nombre"));
-        Page<UsuarioDto> resultado;
+    // Excel export
+    private InputStream excelStream;
+    private String excelFileName;
 
-        if (q != null && !q.isBlank()) {
-            resultado = usuarioService.buscarUsuarios(q, pageable);
-        } else {
-            resultado = usuarioService.obtenerUsuarios(pageable);
-        }
+    public String listar() {
+        Page<UsuarioDto> resultado = consultar(PageRequest.of(page, size, Sort.by("nombre")));
 
         usuarios = resultado.getContent();
         totalPages = resultado.getTotalPages();
         totalElements = resultado.getTotalElements();
         return SUCCESS;
+    }
+
+    /** Exporta a Excel los mismos usuarios del listado (con la búsqueda aplicada), sin paginar. */
+    public String exportarExcel() {
+        try {
+            boolean hayBusqueda = q != null && !q.isBlank();
+            List<UsuarioDto> data = consultar(PageRequest.of(0, Integer.MAX_VALUE, Sort.by("nombre"))).getContent();
+            byte[] excel = listadoExcelService.generarExcelUsuarios(
+                    data, hayBusqueda ? "Nombre contiene \"" + q + "\"" : "Usuarios activos");
+            excelStream = new ByteArrayInputStream(excel);
+            excelFileName = "Usuarios_" + LocalDate.now() + ".xlsx";
+        } catch (Exception e) {
+            flashError("Error al generar Excel: " + e.getMessage());
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    private Page<UsuarioDto> consultar(Pageable pageable) {
+        if (q != null && !q.isBlank()) {
+            return usuarioService.buscarUsuarios(q, pageable);
+        }
+        return usuarioService.obtenerUsuarios(pageable);
+    }
+
+    public InputStream getExcelStream() {
+        return excelStream;
+    }
+
+    public String getExcelFileName() {
+        return excelFileName;
     }
 
     public String formulario() {

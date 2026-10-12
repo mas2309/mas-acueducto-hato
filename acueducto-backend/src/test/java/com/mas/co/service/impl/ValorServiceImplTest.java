@@ -2,11 +2,16 @@ package com.mas.co.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mas.co.dto.ValoresDto;
 import com.mas.co.entity.Valores;
+import com.mas.co.exception.ValidationException;
 import com.mas.co.repository.ValorRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -218,5 +223,103 @@ class ValorServiceImplTest {
     Double result = valorService.calcularValorConsumo(5);
 
     assertEquals(3000.0, result); // 5 * 600 (valores por defecto)
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - Modifica el registro existente")
+  void actualizarValores_RegistroExistente_Success() {
+    when(valorRepository.findFirstByOrderByIdDesc()).thenReturn(Optional.of(valores));
+    when(valorRepository.save(any(Valores.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    Valores result = valorService.actualizarValores(nuevosValores());
+
+    assertEquals(1L, result.getId());
+    assertEquals(4000.0, result.getCargoFijo());
+    assertEquals(2500.0, result.getNoPago());
+    assertEquals(12.0, result.getRangoUno());
+    assertEquals(25.0, result.getRangoDos());
+    assertEquals(40.0, result.getRangoTres());
+    assertEquals(41.0, result.getRangoCuatro());
+    assertEquals(700, result.getValorUno());
+    assertEquals(1200, result.getValorDos());
+    assertEquals(1800, result.getValorTres());
+    assertEquals(4000, result.getValorCuatro());
+    verify(valorRepository).save(valores);
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - Crea el registro si no existe")
+  void actualizarValores_SinRegistro_CreaUno() {
+    when(valorRepository.findFirstByOrderByIdDesc()).thenReturn(Optional.empty());
+    when(valorRepository.save(any(Valores.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    Valores result = valorService.actualizarValores(nuevosValores());
+
+    assertNull(result.getId());
+    assertEquals(4000.0, result.getCargoFijo());
+    verify(valorRepository).save(any(Valores.class));
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - El consumo se calcula con las nuevas tarifas")
+  void actualizarValores_CalculoUsaNuevasTarifas() {
+    when(valorRepository.findFirstByOrderByIdDesc()).thenReturn(Optional.of(valores));
+    when(valorRepository.save(any(Valores.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    valorService.actualizarValores(nuevosValores());
+    Double result = valorService.calcularValorConsumo(45);
+
+    // Rango 1: 12 * 700 = 8400
+    // Rango 2: 13 * 1200 = 15600
+    // Rango 3: 15 * 1800 = 27000
+    // Rango 4: 5 * 4000 = 20000
+    assertEquals(71000.0, result);
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - Rangos desordenados")
+  void actualizarValores_RangosDesordenados_ThrowsException() {
+    ValoresDto dto = nuevosValores();
+    dto.setRangoDos(12);
+
+    assertThrows(ValidationException.class, () -> valorService.actualizarValores(dto));
+
+    verify(valorRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - Valor negativo")
+  void actualizarValores_ValorNegativo_ThrowsException() {
+    ValoresDto dto = nuevosValores();
+    dto.setValorTres(-1);
+
+    assertThrows(ValidationException.class, () -> valorService.actualizarValores(dto));
+
+    verify(valorRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Actualizar valores - Campo obligatorio vacío")
+  void actualizarValores_CampoVacio_ThrowsException() {
+    ValoresDto dto = nuevosValores();
+    dto.setCargoFijo(null);
+
+    assertThrows(ValidationException.class, () -> valorService.actualizarValores(dto));
+
+    verify(valorRepository, never()).save(any());
+  }
+
+  private ValoresDto nuevosValores() {
+    return ValoresDto.builder()
+        .cargoFijo(4000.0)
+        .noPago(2500.0)
+        .rangoUno(12)
+        .rangoDos(25)
+        .rangoTres(40)
+        .valorUno(700)
+        .valorDos(1200)
+        .valorTres(1800)
+        .valorCuatro(4000)
+        .build();
   }
 }

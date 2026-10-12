@@ -1,6 +1,7 @@
 package com.mas.co.entity;
 
 import com.mas.co.constants.BusinessConstants;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,17 +11,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 /**
  * Entidad Factura del sistema de acueducto.
@@ -126,9 +132,12 @@ public class Factura {
   @NotNull(message = "El usuario es obligatorio")
   private Usuario usuario;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "cuota_id")
-  private Cuota cuota;
+  /** Cuotas cobradas en la factura; su suma es {@code valorCuota}. */
+  @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("id ASC")
+  @BatchSize(size = 50)
+  @Builder.Default
+  private List<FacturaCuota> cuotas = new ArrayList<>();
 
   @PrePersist
   protected void onCreate() {
@@ -149,6 +158,21 @@ public class Factura {
     if (pago && pagoBanco) {
       throw new IllegalStateException("No se puede tener pago y pagoBanco activos simultáneamente");
     }
+  }
+
+  /** Agrega una cuota cobrada a la factura. */
+  public void agregarCuota(FacturaCuota facturaCuota) {
+    facturaCuota.setFactura(this);
+    cuotas.add(facturaCuota);
+  }
+
+  /**
+   * Suma el valor de las cuotas cobradas en la factura.
+   *
+   * @return total de cuotas
+   */
+  public double sumarCuotas() {
+    return cuotas.stream().mapToDouble(FacturaCuota::getValor).sum();
   }
 
   /** Calcula el consumo basado en las lecturas. */

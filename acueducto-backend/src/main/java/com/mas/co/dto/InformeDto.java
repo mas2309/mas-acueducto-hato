@@ -52,6 +52,48 @@ public class InformeDto {
     // Discriminación mensual detallada
     private List<InformeMensualDto> detalleMensual;
 
+    // Usuarios con facturas vencidas a la fecha, del que más debe al que menos
+    private List<DeudorDto> deudores;
+
+    // Facturas del período agrupadas por el rango de tarifa en que cae su consumo
+    private List<RangoConsumoDto> rangosConsumo;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RangoConsumoDto {
+        private String nombre;
+        // Consumo que abarca el rango, ej. "11 a 20 m³"
+        private String descripcion;
+        // Valor del m³ en el rango según las tarifas vigentes. Nulo en "Sin consumo"
+        private Integer valorMetroCubico;
+        private int usuarios;
+        private int facturas;
+        private int consumoM3;
+        private double valorConsumo;
+        private int porcentajeFacturas;
+        private int porcentajeValor;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeudorDto {
+        private Long usuarioId;
+        private String usuarioNombre;
+        private boolean usuarioActivo;
+        // valorTotal de la última factura: ya incluye lo arrastrado de las anteriores
+        private double deuda;
+        // Facturas seguidas sin pagar, contando desde la más reciente
+        private int facturasSinPagar;
+        // Período de la factura impaga más antigua, ej. "Marzo 2026"
+        private String debeDesde;
+        // Fecha del último pago, o su período si no quedó fecha. Nulo si nunca ha pagado
+        private String ultimoPago;
+    }
+
     @Data
     @Builder
     @NoArgsConstructor

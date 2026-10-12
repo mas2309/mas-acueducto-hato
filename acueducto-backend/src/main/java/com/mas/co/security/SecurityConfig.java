@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/ingresos/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .requestMatchers("/api/v1/gastos/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .requestMatchers("/api/v1/reports/**").hasAnyRole("ESCRITURA", "LECTURA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/receipt-note/**").hasAnyRole("ESCRITURA", "LECTURA")
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
@@ -106,6 +107,11 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/admin/usuario-guardar*", "/admin/usuario-eliminar*", "/admin/usuario-desactivar*",
                     "/admin/cuota-guardar*", "/admin/cuota-eliminar*", "/admin/cuota-desactivar*", "/admin/cuota-pago*",
+                    "/admin/cobro-global-guardar*", "/admin/cobro-global-eliminar*", "/admin/cobro-global-cancelar*",
+                    "/admin/cobro-global-pago-anticipado*", "/admin/cobro-global-revertir-anticipado*",
+                    "/admin/cobro-global-agregar-usuario*",
+                    // Tarifas: tambien la consulta es exclusiva de ESCRITURA.
+                    "/admin/tarifas*", "/admin/nota-recibo*",
                     "/admin/lectura-ingresar*", "/admin/factura-pagar*", "/admin/factura-eliminar*"
                 ).hasRole("ESCRITURA")
                 // Resto del panel (listados, formularios de vista, detalle, exportaciones): lectura para ambos roles.
@@ -146,7 +152,9 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/actuator/health",
-                    "/actuator/info"
+                    "/actuator/info",
+                    // Precompilación de JSP al arrancar: se protege con un token propio de cada arranque
+                    "/internal/jsp-warmup"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

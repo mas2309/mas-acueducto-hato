@@ -6,7 +6,10 @@ import com.mas.co.dto.UsuarioDto;
 import com.mas.co.service.LecturaService;
 import com.mas.co.service.UsuarioService;
 import com.mas.co.service.impl.FacturaPdfService;
+import com.mas.co.service.impl.ListadoExcelService;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ public class LecturaAction extends BaseAction {
 
     @Autowired
     private FacturaPdfService facturaPdfService;
+
+    @Autowired
+    private ListadoExcelService listadoExcelService;
 
 
     private LecturaDto lectura;
@@ -53,26 +59,90 @@ public class LecturaAction extends BaseAction {
     // Pago
     private String metodoPago;
 
-    public String listar() {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<LecturaDto> resultado;
+    // Excel export
+    private InputStream excelStream;
+    private String excelFileName;
+    private boolean todo;
 
-        if (q != null && !q.isBlank()) {
-            resultado = lecturaService.buscarFacturas(q, pageable);
-        } else if ("pendientes".equals(filtro)) {
-            resultado = lecturaService.obtenerFacturasPendientes(pageable);
-        } else if ("vencidas".equals(filtro)) {
-            resultado = lecturaService.obtenerFacturasVencidas(pageable);
-        } else if ("pagadas".equals(filtro)) {
-            resultado = lecturaService.obtenerFacturasPagadas(pageable);
-        } else {
-            resultado = lecturaService.obtenerFacturasPorAnio(anioFiltro, pageable);
-        }
+    public String listar() {
+        Page<LecturaDto> resultado = consultar(PageRequest.of(page, size));
 
         facturas = resultado.getContent();
         totalPages = resultado.getTotalPages();
         totalElements = resultado.getTotalElements();
         return SUCCESS;
+    }
+
+    /**
+     * Exporta a Excel las mismas facturas del listado (con sus filtros), sin paginar. Con
+     * {@code todo} exporta todas las facturas del sistema.
+     */
+    public String exportarExcel() {
+        try {
+            Pageable sinPaginar = PageRequest.of(0, Integer.MAX_VALUE);
+            List<LecturaDto> data = todo
+                    ? lecturaService.obtenerTodasFacturas(sinPaginar).getContent()
+                    : consultar(sinPaginar).getContent();
+            byte[] excel = listadoExcelService.generarExcelFacturas(data, todo ? "Todas las facturas" : describirFiltro());
+            excelStream = new ByteArrayInputStream(excel);
+            excelFileName = "Facturas_" + (todo ? "todas" : nombreFiltro()) + "_" + LocalDate.now() + ".xlsx";
+        } catch (Exception e) {
+            flashError("Error al generar Excel: " + e.getMessage());
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
+    private Page<LecturaDto> consultar(Pageable pageable) {
+        if (q != null && !q.isBlank()) {
+            return lecturaService.buscarFacturas(q, pageable);
+        } else if ("pendientes".equals(filtro)) {
+            return lecturaService.obtenerFacturasPendientes(pageable);
+        } else if ("vencidas".equals(filtro)) {
+            return lecturaService.obtenerFacturasVencidas(pageable);
+        } else if ("pagadas".equals(filtro)) {
+            return lecturaService.obtenerFacturasPagadas(pageable);
+        }
+        return lecturaService.obtenerFacturasPorAnio(anioFiltro, pageable);
+    }
+
+    private String describirFiltro() {
+        if (q != null && !q.isBlank()) {
+            return "Usuario contiene \"" + q + "\"";
+        }
+        return switch (nombreFiltro()) {
+            case "pendientes" -> "Facturas pendientes de pago";
+            case "vencidas" -> "Facturas vencidas";
+            case "pagadas" -> "Facturas pagadas";
+            default -> "Facturas del año " + anioFiltro;
+        };
+    }
+
+    private String nombreFiltro() {
+        if (q != null && !q.isBlank()) {
+            return "busqueda";
+        }
+        if ("pendientes".equals(filtro) || "vencidas".equals(filtro) || "pagadas".equals(filtro)) {
+            return filtro;
+        }
+        return String.valueOf(anioFiltro);
+    }
+
+    public InputStream getExcelStream() {
+        return excelStream;
+    }
+
+    public String getExcelFileName() {
+        return excelFileName;
+    }
+
+    public boolean isTodo() {
+        return todo;
+    }
+
+    @StrutsParameter
+    public void setTodo(boolean todo) {
+        this.todo = todo;
     }
 
     public String formulario() {

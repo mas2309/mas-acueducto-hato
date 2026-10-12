@@ -1,19 +1,23 @@
 package com.mas.co.service.impl;
 
-import com.mas.co.entity.Cuota;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.FacturaCuota;
 import com.mas.co.exception.BusinessException;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.NotaInformativaService;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -30,8 +34,12 @@ public class FacturaPdfService {
 
     private static final String JRXML_PATH = "/factura/pruebaAcueducto.jrxml";
     private static final String LOGO_PATH = "/images/logo.png";
+    private static final int MAX_CONCEPTOS = 8;
 
     private final FacturaRepository facturaRepository;
+    private final NotaInformativaService notaInformativaService;
+
+    private JasperReport reporteCompilado;
 
 
     public byte[] generarPdf(Long facturaId) {
@@ -41,8 +49,7 @@ public class FacturaPdfService {
                 .orElseThrow(() -> BusinessException.invoiceNotFound(facturaId));
 
         try {
-            InputStream jrxmlStream = getClass().getResourceAsStream(JRXML_PATH);
-            JasperReport report = JasperCompileManager.compileReport(jrxmlStream);
+            JasperReport report = obtenerReporte();
 
             Map<String, Object> parameters = buildParameters(factura);
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
@@ -56,6 +63,16 @@ public class FacturaPdfService {
         }
     }
 
+    /** Compila la plantilla una sola vez: compilarla en cada descarga tarda cerca de un segundo. */
+    private synchronized JasperReport obtenerReporte() throws JRException, IOException {
+        if (reporteCompilado == null) {
+            try (InputStream jrxmlStream = getClass().getResourceAsStream(JRXML_PATH)) {
+                reporteCompilado = JasperCompileManager.compileReport(jrxmlStream);
+            }
+        }
+        return reporteCompilado;
+    }
+
     private Map<String, Object> buildParameters(Factura factura) {
         String rutaImagen = getClass().getResource(LOGO_PATH).toString();
         DecimalFormat df = new DecimalFormat("#,##0.00");
@@ -67,32 +84,80 @@ public class FacturaPdfService {
         params.put("lectura_actual", factura.getLecturaActual());
         params.put("lectura_anterior", factura.getLecturaAnterior());
         params.put("metros_consumidos", factura.getConsumo());
-        params.put("cargo_fijo", toDecimal(factura.getCargoFijo()));
-        params.put("valor_consumo", toDecimal(factura.getValorConsumo()));
-        params.put("deuda_anterior", toDecimal(factura.getDeudaAnterior()));
-        params.put("otros_cobros", toDecimal(factura.getOtrosCobros()));
-        params.put("descripcion", factura.getOtrosCobrosDescripcion());
-        params.put("no_pago", toDecimal(factura.getNoPago()));
         params.put("total", df.format(factura.getValorTotal()));
         params.put("consumo_anterior", obtenerConsumoAnterior(factura));
         params.put("mes", factura.getMes());
         params.put("ruta_imagen", rutaImagen);
+        params.put("nota", notaInformativaService.obtenerTextoVigente());
 
-        // Cuota
-        if (factura.getCuota() != null) {
-            Cuota cuota = factura.getCuota();
-            params.put("descripcion_cuota", cuota.getDescripcion());
-            params.put("cuota_actual", cuota.getCuotaActual());
-            params.put("numero_de_cuotas", cuota.getNumeroCuota());
-            params.put("valor_cuota", toDecimal(cuota.getValorCuota()));
-        } else {
-            params.put("descripcion_cuota", null);
-            params.put("cuota_actual", null);
-            params.put("numero_de_cuotas", null);
-            params.put("valor_cuota", toDecimal(0.0));
+        // El reporte tiene un número fijo de filas: las que no se usan van vacías
+        List<Concepto> conceptos = buildConceptos(factura);
+        List<String> descripciones = new ArrayList<>();
+        List<String> valores = new ArrayList<>();
+        for (int i = 0; i < MAX_CONCEPTOS; i++) {
+            boolean hayConcepto = i < conceptos.size();
+            descripciones.add(hayConcepto ? conceptos.get(i).descripcion() : "");
+            valores.add(hayConcepto ? "$ " + toDecimal(conceptos.get(i).valor()) : "");
         }
+        params.put("conceptos", descripciones);
+        params.put("valores", valores);
 
         return params;
+    }
+
+    /**
+     * Arma las filas de cobro de la factura. Cada cuota va en su propia fila para que el usuario
+     * sepa a qué corresponde cada valor.
+     */
+    List<Concepto> buildConceptos(Factura factura) {
+        List<Concepto> despuesDeCuotas = new ArrayList<>();
+        if (esPositivo(factura.getOtrosCobros())) {
+            String descripcion = factura.getOtrosCobrosDescripcion();
+            despuesDeCuotas.add(new Concepto(
+                    descripcion == null || descripcion.isBlank() ? "OTROS COBROS" : descripcion,
+                    factura.getOtrosCobros()));
+        }
+        if (esPositivo(factura.getNoPago())) {
+            despuesDeCuotas.add(new Concepto("No Pago", factura.getNoPago()));
+        }
+
+        List<Concepto> conceptos = new ArrayList<>();
+        conceptos.add(new Concepto("CARGO FIJO", factura.getCargoFijo()));
+        conceptos.add(new Concepto("CONSUMO", factura.getValorConsumo()));
+        if (esPositivo(factura.getDeudaAnterior())) {
+            conceptos.add(new Concepto("DEUDA ANTERIOR", factura.getDeudaAnterior()));
+        }
+
+        // Si las cuotas no caben en las filas disponibles, las últimas se agrupan en una sola
+        List<FacturaCuota> cuotas = factura.getCuotas();
+        int filasParaCuotas = MAX_CONCEPTOS - conceptos.size() - despuesDeCuotas.size();
+        int cuotasDetalladas = cuotas.size() <= filasParaCuotas ? cuotas.size() : filasParaCuotas - 1;
+        for (FacturaCuota cuota : cuotas.subList(0, cuotasDetalladas)) {
+            conceptos.add(new Concepto(describirCuota(cuota), cuota.getValor()));
+        }
+        List<FacturaCuota> cuotasAgrupadas = cuotas.subList(cuotasDetalladas, cuotas.size());
+        if (!cuotasAgrupadas.isEmpty()) {
+            conceptos.add(new Concepto(
+                    "OTRAS CUOTAS (" + cuotasAgrupadas.size() + ")",
+                    cuotasAgrupadas.stream().mapToDouble(FacturaCuota::getValor).sum()));
+        }
+
+        conceptos.addAll(despuesDeCuotas);
+        return conceptos;
+    }
+
+    private String describirCuota(FacturaCuota cuota) {
+        // Las facturas anteriores al detalle de cuotas no guardaron el número de cuota cobrado
+        Integer numeroCuota = cuota.getNumeroCuota() != null
+                ? cuota.getNumeroCuota() : cuota.getCuota().getCuotaActual();
+        return String.format("%s (cuota %d de %d)", cuota.getDescripcion(), numeroCuota, cuota.getTotalCuotas());
+    }
+
+    private boolean esPositivo(Double value) {
+        return value != null && value > 0;
+    }
+
+    record Concepto(String descripcion, Double valor) {
     }
 
     private Integer obtenerConsumoAnterior(Factura factura) {

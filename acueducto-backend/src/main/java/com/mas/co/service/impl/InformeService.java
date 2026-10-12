@@ -1,12 +1,21 @@
 package com.mas.co.service.impl;
 
+import com.mas.co.constants.BusinessConstants;
 import com.mas.co.dto.InformeDto;
+import com.mas.co.dto.InformeDto.DeudorDto;
 import com.mas.co.dto.InformeDto.InformeMensualDto;
+import com.mas.co.dto.InformeDto.RangoConsumoDto;
 import com.mas.co.entity.Factura;
+import com.mas.co.entity.Valores;
 import com.mas.co.repository.FacturaRepository;
+import com.mas.co.service.ValorService;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +35,7 @@ public class InformeService {
 
     private final FacturaRepository facturaRepository;
     private final EstadoFacturaService estadoFacturaService;
+    private final ValorService valorService;
 
     public List<Integer> obtenerAniosDisponibles() {
         return facturaRepository.findAniosDisponibles();
@@ -47,7 +57,12 @@ public class InformeService {
         InformeDto.InformeDtoBuilder builder = InformeDto.builder();
         calcularTotales(facturas, builder);
         calcularDatosMensuales(facturas, builder);
-        builder.totalDeudaPendienteReal(calcularDeudaPendienteReal());
+        builder.rangosConsumo(calcularRangosConsumo(facturas));
+        List<Factura> ultimasImpagas = facturaRepository.findUltimasFacturasPorUsuario().stream()
+                .filter(f -> !f.isPagada())
+                .toList();
+        builder.totalDeudaPendienteReal(calcularDeudaPendienteReal(ultimasImpagas));
+        builder.deudores(calcularDeudores(ultimasImpagas));
         return builder.build();
     }
 
@@ -57,11 +72,139 @@ public class InformeService {
      * valorTotal. Evita el doble conteo de {@code totalDeudaAnterior}, que al ser un componente
      * de cada factura individual se arrastra y se re-factura mes a mes mientras la deuda persiste.
      */
-    private double calcularDeudaPendienteReal() {
-        return facturaRepository.findUltimasFacturasPorUsuario().stream()
-                .filter(f -> !f.isPagada())
+    private double calcularDeudaPendienteReal(List<Factura> ultimasImpagas) {
+        return ultimasImpagas.stream()
                 .mapToDouble(f -> val(f.getValorTotal()))
                 .sum();
+    }
+
+    /**
+     * Lista, del que más debe al que menos, los usuarios con facturas vencidas a la fecha (no
+     * solo del período filtrado). La deuda es el valorTotal de su última factura, que ya incluye
+     * lo arrastrado. Quien solo tiene pendiente una factura que aún está en plazo no aparece.
+     */
+    private List<DeudorDto> calcularDeudores(List<Factura> ultimasImpagas) {
+        if (ultimasImpagas.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> usuarioIds = ultimasImpagas.stream()
+                .map(f -> f.getUsuario().getId())
+                .collect(Collectors.toSet());
+
+        return facturaRepository.findByUsuarioIdIn(usuarioIds).stream()
+                .collect(Collectors.groupingBy(f -> f.getUsuario().getId()))
+                .values().stream()
+                .map(this::construirDeudor)
+                .flatMap(Optional::stream)
+                .sorted(Comparator.comparingDouble(DeudorDto::getDeuda)
+                        .thenComparingInt(DeudorDto::getFacturasSinPagar).reversed())
+                .toList();
+    }
+
+    private Optional<DeudorDto> construirDeudor(List<Factura> facturasUsuario) {
+        List<Factura> recientesPrimero = facturasUsuario.stream()
+                .sorted(Comparator.comparingInt(this::ordenPeriodo).reversed())
+                .toList();
+
+        // Pagar una factura salda las anteriores, que quedan marcadas como impagas: solo cuentan
+        // las seguidas sin pagar desde la más reciente.
+        List<Factura> sinPagar = recientesPrimero.stream().takeWhile(f -> !f.isPagada()).toList();
+        if (sinPagar.isEmpty()) {
+            return Optional.empty();
+        }
+        Factura masAntigua = sinPagar.get(sinPagar.size() - 1);
+        if (!estadoFacturaService.estaVencida(masAntigua.getMes(), masAntigua.getAnio())) {
+            return Optional.empty();
+        }
+
+        Factura ultima = sinPagar.get(0);
+        String ultimoPago = recientesPrimero.stream()
+                .skip(sinPagar.size())
+                .findFirst()
+                .map(f -> f.getFechaPago() != null ? f.getFechaPago().toString() : periodo(f))
+                .orElse(null);
+
+        return Optional.of(DeudorDto.builder()
+                .usuarioId(ultima.getUsuario().getId())
+                .usuarioNombre(ultima.getUsuario().getNombreCompleto())
+                .usuarioActivo(ultima.getUsuario().isActivo())
+                .deuda(val(ultima.getValorTotal()))
+                .facturasSinPagar(sinPagar.size())
+                .debeDesde(periodo(masAntigua))
+                .ultimoPago(ultimoPago)
+                .build());
+    }
+
+    /**
+     * Agrupa las facturas del período según el rango de tarifa en que cae su consumo. Los límites
+     * son los de las tarifas vigentes, también para facturas generadas con tarifas anteriores.
+     */
+    private List<RangoConsumoDto> calcularRangosConsumo(List<Factura> facturas) {
+        Valores valores = valorService.obtenerValores();
+        int limiteUno = valores.getRangoUno().intValue();
+        int limiteDos = valores.getRangoDos().intValue();
+        int limiteTres = valores.getRangoTres().intValue();
+
+        List<RangoConsumoDto> rangos = List.of(
+                rango("Sin consumo", "0 m³", null),
+                rango("Rango 1", "1 a " + limiteUno + " m³", valores.getValorUno()),
+                rango("Rango 2", (limiteUno + 1) + " a " + limiteDos + " m³", valores.getValorDos()),
+                rango("Rango 3", (limiteDos + 1) + " a " + limiteTres + " m³", valores.getValorTres()),
+                rango("Rango 4", "Más de " + limiteTres + " m³", valores.getValorCuatro()));
+        List<Set<Long>> usuariosPorRango = rangos.stream().map(r -> (Set<Long>) new HashSet<Long>()).toList();
+
+        double valorTotal = 0;
+        for (Factura f : facturas) {
+            int consumo = f.getConsumo() != null ? f.getConsumo() : 0;
+            int indice;
+            if (consumo <= 0) {
+                indice = 0;
+            } else if (consumo <= limiteUno) {
+                indice = 1;
+            } else if (consumo <= limiteDos) {
+                indice = 2;
+            } else if (consumo <= limiteTres) {
+                indice = 3;
+            } else {
+                indice = 4;
+            }
+
+            RangoConsumoDto rango = rangos.get(indice);
+            rango.setFacturas(rango.getFacturas() + 1);
+            rango.setConsumoM3(rango.getConsumoM3() + consumo);
+            rango.setValorConsumo(rango.getValorConsumo() + val(f.getValorConsumo()));
+            usuariosPorRango.get(indice).add(f.getUsuario().getId());
+            valorTotal += val(f.getValorConsumo());
+        }
+
+        for (int i = 0; i < rangos.size(); i++) {
+            RangoConsumoDto rango = rangos.get(i);
+            rango.setUsuarios(usuariosPorRango.get(i).size());
+            rango.setPorcentajeFacturas(porcentaje(rango.getFacturas(), facturas.size()));
+            rango.setPorcentajeValor(porcentaje(rango.getValorConsumo(), valorTotal));
+        }
+
+        // "Sin consumo" solo se muestra si hay facturas en cero
+        return rangos.stream().filter(r -> r.getValorMetroCubico() != null || r.getFacturas() > 0).toList();
+    }
+
+    private RangoConsumoDto rango(String nombre, String descripcion, Integer valorMetroCubico) {
+        return RangoConsumoDto.builder()
+                .nombre(nombre).descripcion(descripcion).valorMetroCubico(valorMetroCubico)
+                .build();
+    }
+
+    private int porcentaje(double parte, double total) {
+        return total > 0 ? (int) Math.round(parte * 100 / total) : 0;
+    }
+
+    private int ordenPeriodo(Factura f) {
+        return f.getAnio() * 100 + BusinessConstants.MONTH_TO_INT.getOrDefault(f.getMes(), 0);
+    }
+
+    private String periodo(Factura f) {
+        return f.getMes() + " " + f.getAnio();
     }
 
     private void calcularTotales(List<Factura> facturas, InformeDto.InformeDtoBuilder builder) {

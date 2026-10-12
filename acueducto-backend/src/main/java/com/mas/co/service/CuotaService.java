@@ -87,6 +87,13 @@ public interface CuotaService {
     List<CuotaDto> obtenerCuotasActivas();
 
     /**
+     * Cuenta las cuotas activas.
+     *
+     * @return número de cuotas activas
+     */
+    long contarCuotasActivas();
+
+    /**
      * Obtiene cuotas activas por usuario.
      * 
      * @param usuarioId ID del usuario
@@ -101,4 +108,21 @@ public interface CuotaService {
      * @return cuota actualizada
      */
     CuotaDto procesarPagoCuota(Long id);
+
+    /**
+     * Registra que el usuario pagó por anticipado las cuotas restantes: la cuota deja de
+     * cobrarse en la factura.
+     *
+     * @param id ID de la cuota
+     * @return cuota actualizada
+     */
+    CuotaDto registrarPagoAnticipado(Long id);
+
+    /**
+     * Deshace un pago anticipado: la cuota vuelve a cobrarse en la factura.
+     *
+     * @param id ID de la cuota
+     * @return cuota actualizada
+     */
+    CuotaDto revertirPagoAnticipado(Long id);
 }

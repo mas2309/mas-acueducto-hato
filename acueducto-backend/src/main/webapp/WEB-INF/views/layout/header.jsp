@@ -41,9 +41,20 @@
             <a href="<s:url namespace='/admin' action='cuotas'/>" class="sidebar-link" id="nav-cuotas">
                 <i class="bi bi-credit-card"></i> Cuotas
             </a>
+            <a href="<s:url namespace='/admin' action='cobros-globales'/>" class="sidebar-link" id="nav-cobros-globales">
+                <i class="bi bi-collection"></i> Cobros Globales
+            </a>
             <a href="<s:url namespace='/admin' action='facturas'/>" class="sidebar-link" id="nav-facturas">
                 <i class="bi bi-receipt"></i> Facturas
             </a>
+            <sec:authorize access="hasRole('ESCRITURA')">
+            <a href="<s:url namespace='/admin' action='tarifas'/>" class="sidebar-link" id="nav-tarifas">
+                <i class="bi bi-sliders"></i> Tarifas
+            </a>
+            <a href="<s:url namespace='/admin' action='nota-recibo'/>" class="sidebar-link" id="nav-nota-recibo">
+                <i class="bi bi-megaphone"></i> Nota en Recibos
+            </a>
+            </sec:authorize>
 
             <div class="sidebar-section">Finanzas</div>
             <a href="<s:url namespace='/admin' action='ingresos'/>" class="sidebar-link" id="nav-ingresos">
