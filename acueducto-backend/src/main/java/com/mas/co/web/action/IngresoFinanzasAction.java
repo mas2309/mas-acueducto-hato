@@ -13,12 +13,14 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component("ingresoFinanzasAction")
+@Scope("prototype")
 public class IngresoFinanzasAction extends BaseAction {
 
     @Autowired
