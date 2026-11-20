@@ -2,12 +2,9 @@ package com.mas.co.web.action;
 
 import com.mas.co.dto.DocumentoDto;
 import com.mas.co.service.DocumentoService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.Part;
 import java.io.File;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.struts2.ActionContext;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -56,29 +53,21 @@ public class DocumentoAction extends BaseAction {
     }
 
     public String guardar() {
-        File archivoTemporal = null;
+        ArchivoSubido subido = null;
         try {
-            HttpServletRequest request = ActionContext.getContext().getServletRequest();
-            String contentType = request.getContentType();
-            Part archivoPart = contentType != null && contentType.toLowerCase().contains("multipart")
-                    ? request.getPart(ARCHIVO_PART) : null;
+            subido = obtenerArchivoSubido(ARCHIVO_PART);
+            File archivo = subido != null ? subido.archivo() : null;
+            String nombreArchivo = subido != null ? subido.nombre() : null;
 
-            String nombreArchivo = null;
-            if (archivoPart != null && archivoPart.getSize() > 0) {
-                nombreArchivo = archivoPart.getSubmittedFileName();
-                archivoTemporal = File.createTempFile("documento_", ".tmp");
-                archivoPart.write(archivoTemporal.getAbsolutePath());
-            }
-
-            documentoService.crear(documento, archivoTemporal, nombreArchivo, getAuthenticatedUsername());
+            documentoService.crear(documento, archivo, nombreArchivo, getAuthenticatedUsername());
             flashExito("Documento guardado exitosamente.");
         } catch (Exception e) {
             log.error("Error al guardar documento: {}", e.getMessage(), e);
             flashError(e.getMessage());
             return INPUT;
         } finally {
-            if (archivoTemporal != null && !archivoTemporal.delete()) {
-                log.warn("No se pudo eliminar archivo temporal: {}", archivoTemporal.getAbsolutePath());
+            if (subido != null) {
+                subido.liberar();
             }
         }
         return SUCCESS;

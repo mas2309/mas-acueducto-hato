@@ -1,5 +1,6 @@
 package com.mas.co.security;
 
+import com.mas.co.config.WebMvcConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -157,6 +158,8 @@ public class SecurityConfig {
                     // Precompilación de JSP al arrancar: se protege con un token propio de cada arranque
                     "/internal/jsp-warmup"
                 ).permitAll()
+                // PWA: manifest, service worker y página sin conexión deben cargarse sin sesión
+                .requestMatchers(WebMvcConfig.pwaRecursos()).permitAll()
                 .anyRequest().authenticated()
             )
             .csrf(csrf -> csrf.disable())

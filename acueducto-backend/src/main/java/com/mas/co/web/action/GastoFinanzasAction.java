@@ -144,44 +144,29 @@ public class GastoFinanzasAction extends BaseAction {
     }
 
     private String handleFileUpload() {
+        ArchivoSubido subido = null;
         try {
-            jakarta.servlet.http.HttpServletRequest request =
-                    org.apache.struts2.ActionContext.getContext().getServletRequest();
-            String contentType = request.getContentType();
-            if (contentType == null || !contentType.toLowerCase().contains("multipart")) {
-                log.debug("Request no es multipart. ContentType: {}", contentType);
+            subido = obtenerArchivoSubido("soporteFile");
+            if (subido == null) {
                 return null;
             }
-
-            jakarta.servlet.http.Part filePart = request.getPart("soporteFile");
-            if (filePart == null || filePart.getSize() == 0) {
-                log.debug("No se recibió archivo de soporte en el Part.");
-                return null;
-            }
-
-            soporteFileFileName = filePart.getSubmittedFileName();
-            soporteFileContentType = filePart.getContentType();
-            log.info("Archivo recibido via Part: '{}' ({}, {} bytes)",
-                    soporteFileFileName, soporteFileContentType, filePart.getSize());
-
-            // Guardar en archivo temporal
-            java.io.File tempFile = java.io.File.createTempFile("soporte_", getExtension(soporteFileFileName));
-            filePart.write(tempFile.getAbsolutePath());
+            soporteFileFileName = subido.nombre();
+            soporteFileContentType = subido.contentType();
 
             String folder = "gastos/soportes";
             String objectKey = folder + "/" + LocalDate.now().getYear()
                     + "/" + LocalDate.now().getMonthValue()
                     + "/" + java.util.UUID.randomUUID() + getExtension(soporteFileFileName);
-            String url = storageService.uploadFile(tempFile, objectKey);
+            String url = storageService.uploadFile(subido.archivo(), objectKey);
             log.info("Soporte subido exitosamente. URL: {}", url);
-
-            if (!tempFile.delete()) {
-                log.warn("No se pudo eliminar archivo temporal: {}", tempFile.getAbsolutePath());
-            }
             return url;
         } catch (Exception e) {
             log.error("Error al procesar/subir soporte: {}", e.getMessage(), e);
             return null;
+        } finally {
+            if (subido != null) {
+                subido.liberar();
+            }
         }
     }
 

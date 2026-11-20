@@ -27,5 +27,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/static/js/admin.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/pwa.js"
+            data-ctx="${pageContext.request.contextPath}"></script>
 </body>
 </html>

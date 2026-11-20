@@ -1,0 +1,52 @@
+{
+  "id": "/admin/",
+  "name": "Acueducto El Hato - Administración",
+  "short_name": "Acueducto",
+  "description": "Panel de administración del Acueducto El Hato: usuarios, lecturas, facturas, finanzas y documentos.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "/admin/dashboard.action?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/static/img/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/pwa/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Facturas",
+      "url": "/admin/facturas.action",
+      "icons": [{ "src": "/static/img/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Usuarios",
+      "url": "/admin/usuarios.action",
+      "icons": [{ "src": "/static/img/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Documentos",
+      "url": "/admin/documentos.action",
+      "icons": [{ "src": "/static/img/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

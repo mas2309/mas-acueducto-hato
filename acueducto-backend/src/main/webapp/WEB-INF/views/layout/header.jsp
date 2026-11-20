@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Acueducto</title>
+    <jsp:include page="/WEB-INF/views/layout/pwa-head.jsp"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -94,11 +95,18 @@
                     <h1 class="topbar-title" id="pageTitle"></h1>
                 </div>
             </div>
-            <form action="${pageContext.request.contextPath}/logout" method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cerrar sesi&oacute;n">
-                    <i class="bi bi-box-arrow-right me-1"></i>Salir
+            <div class="d-flex align-items-center gap-2">
+                <%-- Visible solo cuando el navegador permite instalar la app (lo controla static/js/pwa.js) --%>
+                <button type="button" class="btn btn-sm btn-outline-primary d-none" data-pwa-instalar
+                        title="Instalar como aplicaci&oacute;n">
+                    <i class="bi bi-download me-1"></i>Instalar app
                 </button>
-            </form>
+                <form action="${pageContext.request.contextPath}/logout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cerrar sesi&oacute;n">
+                        <i class="bi bi-box-arrow-right me-1"></i>Salir
+                    </button>
+                </form>
+            </div>
         </header>
 
         <%-- Page Content --%>
