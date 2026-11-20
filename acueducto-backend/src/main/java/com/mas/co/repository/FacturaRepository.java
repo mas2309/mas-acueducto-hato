@@ -21,6 +21,27 @@ import java.util.Optional;
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
+    /** Período de la factura como número AAAAMM, para poder comparar y ordenar períodos. */
+    String PERIODO_SQL = "(f.anio * 100 + CASE f.mes " +
+           "WHEN 'Enero' THEN 1 WHEN 'Febrero' THEN 2 WHEN 'Marzo' THEN 3 WHEN 'Abril' THEN 4 " +
+           "WHEN 'Mayo' THEN 5 WHEN 'Junio' THEN 6 WHEN 'Julio' THEN 7 WHEN 'Agosto' THEN 8 " +
+           "WHEN 'Septiembre' THEN 9 WHEN 'Octubre' THEN 10 WHEN 'Noviembre' THEN 11 WHEN 'Diciembre' THEN 12 " +
+           "END)";
+
+    /**
+     * Obtiene la factura más reciente del usuario anterior al período indicado (AAAAMM).
+     */
+    @Query(value = "SELECT * FROM acueducto.facturas f WHERE f.usuario_id = :usuarioId " +
+           "AND " + PERIODO_SQL + " < :periodo ORDER BY " + PERIODO_SQL + " DESC LIMIT 1", nativeQuery = true)
+    Optional<Factura> findFacturaAnteriorAlPeriodo(@Param("usuarioId") Long usuarioId, @Param("periodo") int periodo);
+
+    /**
+     * Obtiene la factura más próxima del usuario posterior al período indicado (AAAAMM).
+     */
+    @Query(value = "SELECT * FROM acueducto.facturas f WHERE f.usuario_id = :usuarioId " +
+           "AND " + PERIODO_SQL + " > :periodo ORDER BY " + PERIODO_SQL + " ASC LIMIT 1", nativeQuery = true)
+    Optional<Factura> findFacturaSiguienteAlPeriodo(@Param("usuarioId") Long usuarioId, @Param("periodo") int periodo);
+
     /**
      * Obtiene todas las facturas ordenadas por ID descendente.
      */

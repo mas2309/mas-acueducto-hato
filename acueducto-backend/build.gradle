@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'war'
-    id 'org.springframework.boot' version '3.5.6'
+    id 'org.springframework.boot' version '3.5.16'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'checkstyle'
     id 'com.github.spotbugs' version '6.0.7'
@@ -26,9 +26,34 @@ configurations {
 
 repositories {
     mavenCentral()
+    // JasperReports 7.0.7+ usa un OpenPDF parcheado que solo publica Jaspersoft
+    exclusiveContent {
+        forRepository {
+            maven { url = 'https://jaspersoft.jfrog.io/artifactory/third-party-ce-artifacts' }
+        }
+        filter {
+            includeVersionByRegex('com\\.github\\.librepdf', 'openpdf(-parent)?', '.*jaspersoft.*')
+        }
+    }
 }
 
+// Parches de seguridad sobre las versiones que gestiona Spring Boot 3.5.16
+ext['tomcat.version'] = '10.1.61'
+ext['jackson-bom.version'] = '2.21.8'
+ext['postgresql.version'] = '42.7.14'
+ext['netty.version'] = '4.1.139.Final'
+ext['freemarker.version'] = '2.3.35'
+ext['log4j2.version'] = '2.25.5'
+ext['commons-lang3.version'] = '3.21.0'
+
 dependencies {
+    // Dependencias transitivas con vulnerabilidades conocidas (Huawei SDK y JasperReports)
+    constraints {
+        implementation 'org.bouncycastle:bcprov-jdk18on:1.86'
+        implementation 'commons-beanutils:commons-beanutils:1.11.0'
+        implementation 'org.apache.commons:commons-compress:1.28.0'
+    }
+
     // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -53,11 +78,11 @@ dependencies {
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 
     // JasperReports para generación de facturas PDF
-    implementation 'net.sf.jasperreports:jasperreports:7.0.0'
-    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.0'
+    implementation 'net.sf.jasperreports:jasperreports:7.0.8'
+    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.8'
     // Compila la plantilla en memoria. Sin esto Jasper escribe un .java en disco y necesita javac,
     // que no existe en la imagen JRE del contenedor.
-    implementation 'net.sf.jasperreports:jasperreports-jdt:7.0.0'
+    implementation 'net.sf.jasperreports:jasperreports-jdt:7.0.8'
 
     // Apache POI para exportación Excel
     implementation 'org.apache.poi:poi:5.2.5'

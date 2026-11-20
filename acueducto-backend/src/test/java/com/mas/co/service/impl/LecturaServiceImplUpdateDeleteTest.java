@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -103,14 +104,97 @@ class LecturaServiceImplUpdateDeleteTest {
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     LecturaDto result = lecturaService.actualizarFactura(1L, lecturaDto);
 
     assertNotNull(result);
     verify(facturaRepository).findById(1L);
     verify(facturaRepository).save(any(Factura.class));
-    verify(calcularValoresFacturaUseCase).execute(any());
+    verify(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - Anterior pagada elimina la deuda y el recargo")
+  void actualizarFactura_AnteriorPagada_EliminaDeudaYRecargo() {
+    factura.setMes("Agosto");
+    lecturaDto.setMes("Agosto");
+    lecturaDto.setDeudaAnterior(50000.0);
+    Factura julio = facturaDelPeriodo("Julio", 50000.0, true);
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.findFacturaAnteriorAlPeriodo(1L, 202408)).thenReturn(Optional.of(julio));
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(0.0, lecturaDto.getDeudaAnterior());
+    verify(calcularValoresFacturaUseCase).execute(lecturaDto, true);
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - Anterior sin pagar define la deuda y aplica el recargo")
+  void actualizarFactura_AnteriorSinPagar_UsaTotalDeLaAnterior() {
+    factura.setMes("Agosto");
+    lecturaDto.setMes("Agosto");
+    lecturaDto.setDeudaAnterior(1.0);
+    Factura julio = facturaDelPeriodo("Julio", 50000.0, false);
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.findFacturaAnteriorAlPeriodo(1L, 202408)).thenReturn(Optional.of(julio));
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(50000.0, lecturaDto.getDeudaAnterior());
+    verify(calcularValoresFacturaUseCase).execute(lecturaDto, false);
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - Sin factura previa conserva la deuda y no aplica recargo")
+  void actualizarFactura_SinFacturaPrevia_ConservaDeuda() {
+    factura.setDeudaAnterior(30000.0);
+    lecturaDto.setDeudaAnterior(1.0);
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(30000.0, lecturaDto.getDeudaAnterior());
+    verify(calcularValoresFacturaUseCase).execute(lecturaDto, true);
+  }
+
+  @Test
+  @DisplayName("Actualizar factura - Factura pagada conserva la deuda con la que se cobró")
+  void actualizarFactura_FacturaPagada_ConservaDeuda() {
+    factura.setPago(true);
+    factura.setDeudaAnterior(30000.0);
+    lecturaDto.setDeudaAnterior(0.0);
+    lecturaDto.setValorConsumo(10000.0);
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
+    when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
+
+    lecturaService.actualizarFactura(1L, lecturaDto);
+
+    assertEquals(30000.0, factura.getDeudaAnterior());
+    verify(calcularValoresFacturaUseCase).execute(lecturaDto, true);
+  }
+
+  private Factura facturaDelPeriodo(String mes, double valorTotal, boolean pagada) {
+    Factura facturaPeriodo = new Factura();
+    facturaPeriodo.setUsuario(usuario);
+    facturaPeriodo.setMes(mes);
+    facturaPeriodo.setAnio(2024);
+    facturaPeriodo.setValorTotal(valorTotal);
+    facturaPeriodo.setPago(pagada);
+    facturaPeriodo.setPagoBanco(false);
+    return facturaPeriodo;
   }
 
   @Test
@@ -168,7 +252,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(cuotaService.procesarPagoCuota(1L)).thenReturn(cuotaCobrada);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     LecturaDto result = lecturaService.actualizarFactura(1L, lecturaDto);
 
@@ -192,7 +276,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     lecturaService.actualizarFactura(1L, lecturaDto);
 
@@ -216,7 +300,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuota);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     lecturaService.actualizarFactura(1L, lecturaDto);
 
@@ -243,7 +327,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuotaAnterior);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     LecturaDto result = lecturaService.actualizarFactura(1L, lecturaDto);
 
@@ -264,7 +348,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(cuotaRepository.save(any(Cuota.class))).thenReturn(cuota);
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     LecturaDto result = lecturaService.actualizarFactura(1L, lecturaDto);
 
@@ -294,7 +378,7 @@ class LecturaServiceImplUpdateDeleteTest {
     when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
     when(facturaRepository.save(any(Factura.class))).thenReturn(factura);
     when(lecturaMapper.toDto(any(Factura.class))).thenReturn(lecturaDto);
-    doNothing().when(calcularValoresFacturaUseCase).execute(any());
+    doNothing().when(calcularValoresFacturaUseCase).execute(any(), anyBoolean());
 
     LecturaDto result = lecturaService.actualizarFactura(1L, lecturaDto);
 

@@ -45,7 +45,7 @@
 
     <!-- Exclude EI2 for service implementations with injected interfaces -->
     <Match>
-        <Class name="~.*\.service\.impl\.(GastoServiceImpl|IngresoServiceImpl)"/>
+        <Class name="~.*\.service\.impl\.(GastoServiceImpl|IngresoServiceImpl|DocumentoServiceImpl)"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 

@@ -6,10 +6,12 @@ import com.mas.co.security.Role;
 import java.util.List;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component("adminUserAction")
+@Scope("prototype")
 public class AdminUserAction extends BaseAction {
 
     @Autowired

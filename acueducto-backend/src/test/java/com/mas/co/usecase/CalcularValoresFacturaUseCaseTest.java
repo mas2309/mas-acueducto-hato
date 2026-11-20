@@ -80,6 +80,24 @@ class CalcularValoresFacturaUseCaseTest {
     }
 
     @Test
+    @DisplayName("Debe usar el estado de pago indicado sin consultar la última factura")
+    void debeUsarEstadoDePagoIndicado() {
+        LecturaDto dto = new LecturaDto();
+        dto.setUsuarioId(1L);
+        dto.setConsumo(10);
+        dto.setValorCuota(0.0);
+
+        when(valorService.calcularValorConsumo(10)).thenReturn(15000.0);
+        when(valorService.obtenerValores()).thenReturn(valores);
+
+        useCase.execute(dto, true);
+
+        assertEquals(0.0, dto.getNoPago());
+        assertEquals(20000.0, dto.getValorTotal());
+        verify(verificarPagoLecturaAnteriorUseCase, never()).execute(1L);
+    }
+
+    @Test
     @DisplayName("Debe usar cargo fijo existente si ya está definido")
     void debeUsarCargoFijoExistente() {
         LecturaDto dto = new LecturaDto();

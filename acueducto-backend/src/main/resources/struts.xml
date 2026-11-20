@@ -236,6 +236,28 @@
             </result>
         </action>
 
+        <!-- Documentos importantes -->
+        <action name="documentos" class="documentoAction" method="listar">
+            <result>/WEB-INF/views/admin/documentos/lista.jsp</result>
+        </action>
+
+        <action name="documento-formulario" class="documentoAction" method="formulario">
+            <result>/WEB-INF/views/admin/documentos/formulario.jsp</result>
+        </action>
+
+        <action name="documento-guardar" class="documentoAction" method="guardar">
+            <result type="redirectAction">
+                <param name="actionName">documentos</param>
+            </result>
+            <result name="input">/WEB-INF/views/admin/documentos/formulario.jsp</result>
+        </action>
+
+        <action name="documento-eliminar" class="documentoAction" method="eliminar">
+            <result type="redirectAction">
+                <param name="actionName">documentos</param>
+            </result>
+        </action>
+
         <!-- Informes -->
         <action name="informes" class="informeAction" method="ver">
             <result>/WEB-INF/views/admin/informes/dashboard.jsp</result>

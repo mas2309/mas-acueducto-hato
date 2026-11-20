@@ -21,6 +21,7 @@ import com.mas.co.usecase.ObtenerLecturaAnteriorUseCase;
 import com.mas.co.usecase.ValidarPeriodoConsecutivoUseCase;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -154,7 +155,8 @@ public class LecturaServiceImpl implements LecturaService {
     
     factura.setFechaPago(LocalDate.now());
     Factura facturaPagada = facturaRepository.save(factura);
-    
+    recalcularFacturasSiguientes(facturaPagada);
+
     log.info("Pago registrado exitosamente para factura ID: {} - Método: {}", facturaId, metodoPago);
     return lecturaMapper.toDto(facturaPagada);
   }
@@ -221,13 +223,87 @@ public class LecturaServiceImpl implements LecturaService {
     lecturaDto.setConsumo(lecturaDto.getLecturaActual() - lecturaDto.getLecturaAnterior());
     
     procesarCambioCuotas(facturaExistente, lecturaDto);
-    calcularValoresFacturaUseCase.execute(lecturaDto);
+    boolean anteriorPagada = aplicarSaldoAnterior(facturaExistente, lecturaDto);
+    calcularValoresFacturaUseCase.execute(lecturaDto, anteriorPagada);
     ajustarValoresSiPagada(facturaExistente, lecturaDto);
     actualizarEntidadFactura(facturaExistente, lecturaDto);
-    
+
     Factura facturaActualizada = facturaRepository.save(facturaExistente);
+    recalcularFacturasSiguientes(facturaActualizada);
     log.info("Factura actualizada exitosamente - ID: {}", facturaId);
     return lecturaMapper.toDto(facturaActualizada);
+  }
+
+  /**
+   * Define la deuda anterior de la factura a partir de la factura del período previo, sin confiar en
+   * el valor enviado por el cliente. Una factura ya pagada conserva la deuda con la que se cobró, y
+   * también la que no tiene factura previa con la cual recalcularla.
+   *
+   * @return {@code true} si no corresponde aplicar el recargo por no pago
+   */
+  private boolean aplicarSaldoAnterior(Factura factura, LecturaDto lecturaDto) {
+    Optional<Factura> anterior = buscarFacturaAnterior(lecturaDto);
+    if (factura.isPagada() || anterior.isEmpty()) {
+      lecturaDto.setDeudaAnterior(factura.getDeudaAnterior());
+      return true;
+    }
+    boolean anteriorPagada = anterior.get().isPagada();
+    lecturaDto.setDeudaAnterior(anteriorPagada ? 0.0 : valorOCero(anterior.get().getValorTotal()));
+    return anteriorPagada;
+  }
+
+  private Optional<Factura> buscarFacturaAnterior(LecturaDto lecturaDto) {
+    Integer mes = BusinessConstants.MONTH_TO_INT.get(lecturaDto.getMes());
+    if (mes == null) {
+      return Optional.empty();
+    }
+    return facturaRepository.findFacturaAnteriorAlPeriodo(
+        lecturaDto.getUsuarioId(), lecturaDto.getAnio() * 100 + mes);
+  }
+
+  /**
+   * Traslada el saldo de la factura a las siguientes que sigan sin pagar: cada una arrastra el total
+   * de la previa. Se detiene en la primera pagada, porque el histórico cobrado no se modifica.
+   */
+  private void recalcularFacturasSiguientes(Factura factura) {
+    Factura anterior = factura;
+    Optional<Factura> siguiente = buscarFacturaSiguiente(anterior);
+    while (siguiente.isPresent() && !siguiente.get().isPagada()) {
+      actualizarSaldoAnterior(siguiente.get(), anterior);
+      anterior = facturaRepository.save(siguiente.get());
+      siguiente = buscarFacturaSiguiente(anterior);
+    }
+  }
+
+  private Optional<Factura> buscarFacturaSiguiente(Factura factura) {
+    Integer mes = BusinessConstants.MONTH_TO_INT.get(factura.getMes());
+    if (mes == null) {
+      return Optional.empty();
+    }
+    return facturaRepository.findFacturaSiguienteAlPeriodo(
+        factura.getUsuario().getId(), factura.getAnio() * 100 + mes);
+  }
+
+  /**
+   * Cambia solo la deuda anterior y el recargo por no pago; el consumo y los demás cobros de la
+   * factura se conservan con las tarifas con las que se generó.
+   */
+  private void actualizarSaldoAnterior(Factura factura, Factura anterior) {
+    boolean anteriorPagada = anterior.isPagada();
+    double deudaNueva = anteriorPagada ? 0.0 : valorOCero(anterior.getValorTotal());
+    double noPagoNuevo = anteriorPagada ? 0.0 : valorOCero(factura.getNoPago());
+    double totalSinSaldo = valorOCero(factura.getValorTotal())
+        - valorOCero(factura.getDeudaAnterior())
+        - valorOCero(factura.getNoPago());
+
+    factura.setDeudaAnterior(deudaNueva);
+    factura.setNoPago(noPagoNuevo);
+    factura.setValorTotal(totalSinSaldo + deudaNueva + noPagoNuevo);
+    factura.setFechaActualizacion(LocalDate.now());
+  }
+
+  private double valorOCero(Double valor) {
+    return valor == null ? 0.0 : valor;
   }
 
   private void validarActualizacionFactura(Factura facturaExistente, LecturaDto lecturaDto) {

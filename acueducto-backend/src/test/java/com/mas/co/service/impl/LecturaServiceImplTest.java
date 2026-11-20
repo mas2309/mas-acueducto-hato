@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -248,6 +249,89 @@ class LecturaServiceImplTest {
 
     assertNotNull(result);
     verify(facturaRepository).save(any());
+  }
+
+  @Test
+  @DisplayName("Registrar pago atrasado - Quita deuda y recargo de la siguiente sin pagar")
+  void registrarPago_Atrasado_RecalculaSiguiente() {
+    factura.setMes("Julio");
+    factura.setValorTotal(50000.0);
+    // Agosto: 20000 propios + 50000 de deuda + 2000 de recargo
+    Factura agosto = facturaConSaldo("Agosto", 72000.0, 50000.0, 2000.0);
+    PagoDto pagoDto = new PagoDto();
+    pagoDto.setMetodoPago("EFECTIVO");
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    when(facturaRepository.findFacturaSiguienteAlPeriodo(1L, 202407)).thenReturn(Optional.of(agosto));
+    when(lecturaMapper.toDto(any())).thenReturn(lecturaDto);
+
+    lecturaService.registrarPago(1L, pagoDto);
+
+    assertEquals(0.0, agosto.getDeudaAnterior());
+    assertEquals(0.0, agosto.getNoPago());
+    assertEquals(20000.0, agosto.getValorTotal());
+  }
+
+  @Test
+  @DisplayName("Registrar pago atrasado - Traslada el nuevo saldo por toda la cadena sin pagar")
+  void registrarPago_Atrasado_RecalculaCadena() {
+    factura.setMes("Julio");
+    factura.setValorTotal(50000.0);
+    Factura agosto = facturaConSaldo("Agosto", 72000.0, 50000.0, 2000.0);
+    // Septiembre: 30000 propios + 72000 de agosto + 2000 de recargo
+    Factura septiembre = facturaConSaldo("Septiembre", 104000.0, 72000.0, 2000.0);
+    PagoDto pagoDto = new PagoDto();
+    pagoDto.setMetodoPago("EFECTIVO");
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    when(facturaRepository.findFacturaSiguienteAlPeriodo(1L, 202407)).thenReturn(Optional.of(agosto));
+    when(facturaRepository.findFacturaSiguienteAlPeriodo(1L, 202408)).thenReturn(Optional.of(septiembre));
+    when(lecturaMapper.toDto(any())).thenReturn(lecturaDto);
+
+    lecturaService.registrarPago(1L, pagoDto);
+
+    assertEquals(20000.0, agosto.getValorTotal());
+    // Agosto sigue sin pagar: septiembre conserva el recargo y arrastra el nuevo total de agosto
+    assertEquals(20000.0, septiembre.getDeudaAnterior());
+    assertEquals(2000.0, septiembre.getNoPago());
+    assertEquals(52000.0, septiembre.getValorTotal());
+  }
+
+  @Test
+  @DisplayName("Registrar pago atrasado - No modifica una factura siguiente ya pagada")
+  void registrarPago_Atrasado_NoModificaSiguientePagada() {
+    factura.setMes("Julio");
+    factura.setValorTotal(50000.0);
+    Factura agosto = facturaConSaldo("Agosto", 72000.0, 50000.0, 2000.0);
+    agosto.setPagoBanco(true);
+    PagoDto pagoDto = new PagoDto();
+    pagoDto.setMetodoPago("EFECTIVO");
+
+    when(facturaRepository.findById(1L)).thenReturn(Optional.of(factura));
+    when(facturaRepository.save(any())).thenReturn(factura);
+    when(facturaRepository.findFacturaSiguienteAlPeriodo(1L, 202407)).thenReturn(Optional.of(agosto));
+    when(lecturaMapper.toDto(any())).thenReturn(lecturaDto);
+
+    lecturaService.registrarPago(1L, pagoDto);
+
+    assertEquals(50000.0, agosto.getDeudaAnterior());
+    assertEquals(72000.0, agosto.getValorTotal());
+    verify(facturaRepository, times(1)).save(any());
+  }
+
+  private Factura facturaConSaldo(String mes, double total, double deuda, double noPago) {
+    Factura facturaPeriodo = new Factura();
+    facturaPeriodo.setUsuario(usuario);
+    facturaPeriodo.setMes(mes);
+    facturaPeriodo.setAnio(2024);
+    facturaPeriodo.setValorTotal(total);
+    facturaPeriodo.setDeudaAnterior(deuda);
+    facturaPeriodo.setNoPago(noPago);
+    facturaPeriodo.setPago(false);
+    facturaPeriodo.setPagoBanco(false);
+    return facturaPeriodo;
   }
 
   @Test

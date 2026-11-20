@@ -18,11 +18,21 @@ public class CalcularValoresFacturaUseCase {
     private final VerificarPagoLecturaAnteriorUseCase verificarPagoLecturaAnteriorUseCase;
 
     /**
-     * Ejecuta el cálculo de todos los valores de la factura.
+     * Calcula los valores de una factura nueva, que todavía no es la última del usuario.
      *
      * @param lecturaDto El DTO de la lectura, que se enriquecerá con los valores calculados.
      */
     public void execute(LecturaDto lecturaDto) {
+        execute(lecturaDto, verificarPagoLecturaAnteriorUseCase.execute(lecturaDto.getUsuarioId()));
+    }
+
+    /**
+     * Calcula los valores de una factura conociendo si la factura anterior fue pagada.
+     *
+     * @param lecturaDto El DTO de la lectura, que se enriquecerá con los valores calculados.
+     * @param lecturaAnteriorPagada {@code false} para aplicar el recargo por no pago.
+     */
+    public void execute(LecturaDto lecturaDto, boolean lecturaAnteriorPagada) {
         log.debug("Calculando valores para consumo: {} m³", lecturaDto.getConsumo());
 
         // Calcular valor del consumo usando rangos
@@ -43,7 +53,6 @@ public class CalcularValoresFacturaUseCase {
         }
 
         // Aplicar valor de no pago si la factura anterior no fue pagada
-        boolean lecturaAnteriorPagada = verificarPagoLecturaAnteriorUseCase.execute(lecturaDto.getUsuarioId());
         Double valorNoPago = 0.0;
         if (!lecturaAnteriorPagada) {
             valorNoPago = valorService.obtenerValores().getNoPago();

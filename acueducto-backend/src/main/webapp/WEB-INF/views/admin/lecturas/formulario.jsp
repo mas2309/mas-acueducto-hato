@@ -111,10 +111,9 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="otrosCobros" class="form-label">Otros Cobros ($)</label>
-                    <input type="number" name="lectura.otrosCobros" id="otrosCobros"
-                           value="<s:property value='lectura.otrosCobros'/>"
-                           class="form-control" placeholder="0"
-                           min="0" step="0.01"/>
+                    <input type="text" inputmode="decimal" name="otrosCobros" id="otrosCobros"
+                           value="<s:property value='otrosCobros'/>"
+                           class="form-control" placeholder="Ej: 30000"/>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="otrosCobrosDescripcion" class="form-label">Descripci&oacute;n</label>

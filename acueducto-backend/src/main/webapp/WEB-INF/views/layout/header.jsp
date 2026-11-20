@@ -68,6 +68,9 @@
             <a href="<s:url namespace='/admin' action='informes'/>" class="sidebar-link" id="nav-informes">
                 <i class="bi bi-bar-chart-line"></i> Informes
             </a>
+            <a href="<s:url namespace='/admin' action='documentos'/>" class="sidebar-link" id="nav-documentos">
+                <i class="bi bi-folder2-open"></i> Documentos Importantes
+            </a>
 
             <sec:authorize access="hasAnyRole('ESCRITURA', 'LECTURA')">
             <div class="sidebar-section">Seguridad</div>

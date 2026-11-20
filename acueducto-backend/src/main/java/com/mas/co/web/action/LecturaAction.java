@@ -40,6 +40,8 @@ public class LecturaAction extends BaseAction {
     private List<LecturaDto> facturas;
     private List<UsuarioDto> usuariosActivos;
     private Long id;
+    // Se recibe como texto para no depender del locale en la conversión (ver parsearMonto)
+    private String otrosCobros;
 
     // PDF
     private InputStream pdfStream;
@@ -155,6 +157,9 @@ public class LecturaAction extends BaseAction {
 
     public String ingresar() {
         try {
+            if (lectura != null) {
+                lectura.setOtrosCobros(parsearMonto(otrosCobros));
+            }
             LecturaDto resultado = lecturaService.ingresarLectura(lectura);
             flashExito("Lectura ingresada exitosamente. Factura #" + resultado.getId()
                     + " generada por $" + String.format("%.0f", resultado.getValorTotal()));
@@ -164,6 +169,33 @@ public class LecturaAction extends BaseAction {
             return INPUT;
         }
         return SUCCESS;
+    }
+
+    /**
+     * Convierte el monto escrito en el formulario sin depender del locale de la petición: Struts
+     * convierte los Double con el idioma del navegador y un input type="number" toma el punto
+     * como decimal, así "30.000" (formato colombiano) terminaba guardándose como 30. Se acepta
+     * "30000", "30.000", "$ 30.000", "30.000,50" y "30000.50".
+     */
+    static Double parsearMonto(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return null;
+        }
+        String limpio = texto.replaceAll("[\\s$]", "");
+        if (limpio.contains(",")) {
+            limpio = limpio.replace(".", "").replace(',', '.');
+        } else if (limpio.matches("\\d{1,3}(\\.\\d{3})+")) {
+            limpio = limpio.replace(".", "");
+        }
+        try {
+            double monto = Double.parseDouble(limpio);
+            if (monto < 0) {
+                throw new IllegalArgumentException("Los otros cobros no pueden ser negativos");
+            }
+            return monto;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Valor de otros cobros inválido: " + texto);
+        }
     }
 
     public String pagar() {
@@ -227,6 +259,15 @@ public class LecturaAction extends BaseAction {
     @StrutsParameter(depth = 1)
     public void setLectura(LecturaDto lectura) {
         this.lectura = lectura;
+    }
+
+    public String getOtrosCobros() {
+        return otrosCobros;
+    }
+
+    @StrutsParameter
+    public void setOtrosCobros(String otrosCobros) {
+        this.otrosCobros = otrosCobros;
     }
 
     public List<LecturaDto> getFacturas() {
